@@ -1,6 +1,24 @@
 const TOKEN_KEY = 'essensys_token';
 
-export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY);
+/** Support-site login stores JWT in adminToken (localStorage or sessionStorage). */
+export const getToken = (): string | null =>
+  localStorage.getItem(TOKEN_KEY)
+  || localStorage.getItem('adminToken')
+  || sessionStorage.getItem('adminToken');
+
+/** Persist OAuth token from URL (?token=...) when redirect lands on /portal/. */
+export const captureTokenFromURL = (): void => {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get('token');
+  if (!urlToken) {
+    return;
+  }
+  sessionStorage.setItem('adminToken', urlToken);
+  params.delete('token');
+  const qs = params.toString();
+  const next = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+  window.history.replaceState({}, '', next);
+};
 
 export const portalFetch = async (path: string, init: RequestInit = {}): Promise<Response> => {
   const token = getToken();

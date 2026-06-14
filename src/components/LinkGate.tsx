@@ -1,13 +1,15 @@
 import { FormEvent, useEffect, useState } from 'react';
-import { fetchLinkStatus, submitLinkRequest } from '../api/portalApi';
+import { fetchLinkStatus, getToken, submitLinkRequest } from '../api/portalApi';
 
 export const LinkGate = () => {
   const [status, setStatus] = useState<string>('loading');
   const [serial, setSerial] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
+    setAuthed(Boolean(getToken()));
     fetchLinkStatus()
       .then((s) => setStatus(s.link_request?.status ?? 'none'))
       .catch(() => setStatus('error'));
@@ -16,16 +18,30 @@ export const LinkGate = () => {
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
+    if (!getToken()) {
+      setError('Connectez-vous d\'abord sur le site Essensys.');
+      return;
+    }
     try {
       await submitLinkRequest(serial, message);
       setStatus('pending');
     } catch {
-      setError('Échec envoi de la demande');
+      setError('Échec envoi de la demande — vérifiez que vous êtes connecté.');
     }
   };
 
   if (status === 'loading') {
     return <p>Chargement…</p>;
+  }
+
+  if (!authed) {
+    return (
+      <div className="gate">
+        <h2>Connexion requise</h2>
+        <p>Connectez-vous avec votre compte Essensys pour déposer une demande de liaison.</p>
+        <p><a href="/login">Se connecter</a></p>
+      </div>
+    );
   }
   if (status === 'pending') {
     return (
