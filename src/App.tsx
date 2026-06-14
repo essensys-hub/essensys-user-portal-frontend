@@ -4,7 +4,7 @@ import { DashboardProvider } from './context/DashboardContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { MainLayout } from './layouts';
 import { LinkGate } from './components/LinkGate';
-import { captureTokenFromURL, fetchLinkStatus } from './api/portalApi';
+import { captureTokenFromURL, fetchLinkStatus, getToken, logout } from './api/portalApi';
 import {
   DashboardPage,
   SecurityPage,
@@ -69,8 +69,17 @@ function App() {
   if (!access) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <header className="bg-essensys-primary text-white px-6 py-4">
+        <header className="bg-essensys-primary text-white px-6 py-4 flex items-center justify-between">
           <strong>Essensys Portail</strong>
+          {getToken() && (
+            <button
+              type="button"
+              onClick={logout}
+              className="text-sm px-3 py-1 rounded-lg border border-white/40 hover:bg-white/10"
+            >
+              Déconnexion
+            </button>
+          )}
         </header>
         <main className="max-w-lg mx-auto p-6">
           <LinkGate onAccessGranted={refreshAccess} />

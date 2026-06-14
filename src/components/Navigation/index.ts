@@ -3,3 +3,4 @@ export type { NavItem } from './SidebarMenu';
 export { BottomTabs } from './BottomTabs';
 export { MobileDrawer } from './MobileDrawer';
 export { MobileHeader } from './MobileHeader';
+export { LogoutButton } from './LogoutButton';

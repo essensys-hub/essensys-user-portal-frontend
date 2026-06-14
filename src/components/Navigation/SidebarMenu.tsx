@@ -11,6 +11,7 @@ import {
   BellIcon,
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
+import { LogoutButton } from './LogoutButton';
 
 interface NavItem {
   to: string;
@@ -65,8 +66,9 @@ export const SidebarMenu: React.FC = () => {
       </nav>
 
       {/* Footer */}
-      <div className="px-6 py-4 border-t border-gray-200">
-        <p className="text-xs text-gray-500">Mon Essensys v1.2.0</p>
+      <div className="px-3 py-4 border-t border-gray-200 space-y-2">
+        <LogoutButton />
+        <p className="px-3 text-xs text-gray-500">Mon Essensys v1.2.0</p>
       </div>
     </aside>
   );

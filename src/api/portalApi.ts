@@ -79,3 +79,19 @@ export const fetchGatewayOnline = async (): Promise<boolean> => {
   const data = await res.json();
   return Boolean(data.online);
 };
+
+/** Efface le JWT support-site / portail (mêmes clés que Login.jsx). */
+export const clearAuth = (): void => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem('adminToken');
+  localStorage.removeItem('adminRole');
+  sessionStorage.removeItem('adminToken');
+  sessionStorage.removeItem('adminRole');
+  window.dispatchEvent(new Event('auth-change'));
+};
+
+/** Déconnexion → page login support-site avec retour portail. */
+export const logout = (): void => {
+  clearAuth();
+  window.location.href = '/login?return=/portal/';
+};

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { navItems } from './SidebarMenu';
+import { LogoutButton } from './LogoutButton';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -88,8 +89,9 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
         </nav>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 py-4 border-t border-gray-200 bg-white">
-          <p className="text-xs text-gray-500">Mon Essensys v1.2.0</p>
+        <div className="absolute bottom-0 left-0 right-0 px-3 py-4 border-t border-gray-200 bg-white space-y-2">
+          <LogoutButton />
+          <p className="px-3 text-xs text-gray-500">Mon Essensys v1.2.0</p>
         </div>
       </div>
     </div>
