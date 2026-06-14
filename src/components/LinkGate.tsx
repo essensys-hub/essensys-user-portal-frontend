@@ -9,10 +9,17 @@ export const LinkGate = () => {
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
-    setAuthed(Boolean(getToken()));
+    const syncAuth = () => setAuthed(Boolean(getToken()));
+    syncAuth();
+    window.addEventListener('storage', syncAuth);
+    window.addEventListener('focus', syncAuth);
     fetchLinkStatus()
       .then((s) => setStatus(s.link_request?.status ?? 'none'))
       .catch(() => setStatus('error'));
+    return () => {
+      window.removeEventListener('storage', syncAuth);
+      window.removeEventListener('focus', syncAuth);
+    };
   }, []);
 
   const onSubmit = async (e: FormEvent) => {
@@ -39,7 +46,7 @@ export const LinkGate = () => {
       <div className="gate">
         <h2>Connexion requise</h2>
         <p>Connectez-vous avec votre compte Essensys pour déposer une demande de liaison.</p>
-        <p><a href="/login">Se connecter</a></p>
+        <p><a href="/login?return=/portal/">Se connecter</a></p>
       </div>
     );
   }
