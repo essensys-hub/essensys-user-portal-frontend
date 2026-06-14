@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { DashboardProvider } from './context/DashboardContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -48,10 +48,14 @@ function PortalRoutes() {
 function App() {
   const [access, setAccess] = useState<boolean | null>(null);
 
-  useEffect(() => {
+  const refreshAccess = useCallback(() => {
     fetchLinkStatus()
       .then((s) => setAccess(s.portal_access))
       .catch(() => setAccess(false));
+  }, []);
+
+  useEffect(() => {
+    refreshAccess();
   }, []);
 
   if (access === null) {
@@ -69,7 +73,7 @@ function App() {
           <strong>Essensys Portail</strong>
         </header>
         <main className="max-w-lg mx-auto p-6">
-          <LinkGate />
+          <LinkGate onAccessGranted={refreshAccess} />
         </main>
       </div>
     );

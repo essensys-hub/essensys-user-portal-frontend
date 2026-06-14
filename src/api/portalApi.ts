@@ -32,8 +32,14 @@ export const portalFetch = async (path: string, init: RequestInit = {}): Promise
 
 export interface LinkStatusResponse {
   portal_access: boolean;
-  link_request?: { status: string; machine_serial: string; message?: string };
+  link_request?: {
+    status: string;
+    machine_serial: string;
+    message?: string | null;
+    created_at?: string;
+  };
   linked_gateway_id?: string | null;
+  linked_machine_id?: number | null;
 }
 
 export const fetchLinkStatus = async (): Promise<LinkStatusResponse> => {

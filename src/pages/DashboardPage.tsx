@@ -14,10 +14,10 @@ import { CardSummary } from '../components/UI';
 import { useLastAction } from '../hooks';
 import { fetchGatewayOnline } from '../api/portalApi';
 
-const formatActionInfo = (actionType: string, actionInfo: string): string => {
+const formatActionInfo = (actionType: string | null | undefined, actionInfo: string | null | undefined): string => {
   if (actionInfo) return actionInfo;
   if (actionType === 'LEGACY') return 'Commande envoyée';
-  return actionType;
+  return actionType || 'Action cloud';
 };
 
 export const DashboardPage: React.FC = () => {
