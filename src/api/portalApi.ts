@@ -1,3 +1,5 @@
+import { noticePortalError } from '../observability/newrelic';
+
 const TOKEN_KEY = 'essensys_token';
 
 /** Support-site login stores JWT in adminToken (localStorage or sessionStorage). */
@@ -27,7 +29,16 @@ export const portalFetch = async (path: string, init: RequestInit = {}): Promise
     headers.set('Authorization', `Bearer ${token}`);
   }
   headers.set('Content-Type', 'application/json');
-  return fetch(`/api/portal${path}`, { ...init, headers });
+  try {
+    const res = await fetch(`/api/portal${path}`, { ...init, headers });
+    if (res.status >= 500) {
+      noticePortalError(new Error(`HTTP ${res.status}`), path, res.status);
+    }
+    return res;
+  } catch (err) {
+    noticePortalError(err, path);
+    throw err;
+  }
 };
 
 export interface LinkStatusResponse {

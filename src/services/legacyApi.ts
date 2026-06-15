@@ -49,7 +49,7 @@ export const sendInjection = async (k: number, v: string): Promise<void> => {
   }
 };
 
-/** Lecture indices table d'échange — stub cloud tant que pas de proxy gateway. */
+/** Lecture indices table d'échange — cache cloud (gateway push) ou fallback mystatus. */
 export const getExchangeValues = async (keys: number[]): Promise<Record<number, string>> => {
   const qs = keys.join(',');
   const response = await fetch(`/api/portal/exchange?keys=${qs}`, {
@@ -59,7 +59,14 @@ export const getExchangeValues = async (keys: number[]): Promise<Record<number, 
   if (!response.ok) {
     return {};
   }
-  const data: { values: Array<{ k: number; v: string }> } = await response.json();
+  const data: {
+    values: Array<{ k: number; v: string }>;
+    stale?: boolean;
+    source?: string;
+  } = await response.json();
+  if (data.stale) {
+    console.warn('[portal] exchange stale', data.source ?? 'unknown');
+  }
   const out: Record<number, string> = {};
   for (const row of data.values ?? []) {
     out[row.k] = row.v;

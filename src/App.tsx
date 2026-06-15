@@ -5,6 +5,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { MainLayout } from './layouts';
 import { LinkGate } from './components/LinkGate';
 import { captureTokenFromURL, fetchLinkStatus, getToken, logout } from './api/portalApi';
+import { NewRelicPageTracker } from './observability/NewRelicPageTracker';
 import {
   DashboardPage,
   SecurityPage,
@@ -24,6 +25,7 @@ function PortalRoutes() {
     <DashboardProvider>
       <ThemeProvider>
         <BrowserRouter basename="/portal">
+          <NewRelicPageTracker />
           <Routes>
             <Route element={<MainLayout />}>
               <Route index element={<Navigate to="/dashboard" replace />} />
