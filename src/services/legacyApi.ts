@@ -49,6 +49,21 @@ export const sendInjection = async (k: number, v: string): Promise<void> => {
   }
 };
 
+/** Envoie plusieurs indices dans une seule action cloud (planning chauffage, etc.). */
+export const sendInjectionBatch = async (items: Array<{ k: number; v: string }>): Promise<void> => {
+  if (items.length === 0) return;
+  const response = await fetch('/api/portal/inject/batch', {
+    method: 'POST',
+    headers: portalHeaders(),
+    body: JSON.stringify({ params: items.map(({ k, v }) => ({ k, v: String(v) })) }),
+  });
+  handleAuthError(response);
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `Batch injection failed (${response.status})`);
+  }
+};
+
 /** Lecture indices table d'échange — cache cloud (gateway push) ou fallback mystatus. */
 export const getExchangeValues = async (keys: number[]): Promise<Record<number, string>> => {
   const qs = keys.join(',');
