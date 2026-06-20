@@ -51,7 +51,51 @@ export interface LinkStatusResponse {
   };
   linked_gateway_id?: string | null;
   linked_machine_id?: number | null;
+  linked_armoire_id?: number | null;
 }
+
+export interface PortalUserInfo {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+  linked_machine_id?: number | null;
+  linked_gateway_id?: string | null;
+  linked_armoire_id?: number | null;
+}
+
+export interface PortalGatewayInfo {
+  id: string;
+  hostname?: string;
+  ip?: string;
+  online: boolean;
+  last_seen?: string;
+}
+
+export interface PortalArmoireInfo {
+  id: number;
+  no_serie: string;
+  ip: string;
+  last_seen?: string;
+  geo_location?: string;
+  remote: boolean;
+}
+
+export interface PortalSessionResponse {
+  user: PortalUserInfo;
+  portal_access: boolean;
+  gateway?: PortalGatewayInfo | null;
+  armoire?: PortalArmoireInfo | null;
+}
+
+export const fetchPortalSession = async (): Promise<PortalSessionResponse> => {
+  const res = await portalFetch('/session');
+  if (!res.ok) {
+    throw new Error('session failed');
+  }
+  return res.json();
+};
 
 export const fetchLinkStatus = async (): Promise<LinkStatusResponse> => {
   const res = await portalFetch('/link-request/status');

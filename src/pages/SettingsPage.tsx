@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Cog6ToothIcon, CheckCircleIcon, ShieldCheckIcon, ExclamationTriangleIcon, ServerStackIcon, ArrowTopRightOnSquareIcon, ChartBarIcon } from '@heroicons/react/24/outline';
-import { PageHeader, ControlCard, ActionButton } from '../components/UI';
+import { PageHeader, ControlCard, ActionButton, PortalContextPanel } from '../components/UI';
 import { useTheme } from '../context/ThemeContext';
 import type { Theme } from '../context/ThemeContext';
 
@@ -78,6 +78,8 @@ export const SettingsPage: React.FC = () => {
         backLink="/dashboard"
         backLabel="Tableau de bord"
       />
+
+      <PortalContextPanel />
 
       {/* Success Message */}
       {saved && (

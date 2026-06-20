@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import { navItems } from './SidebarMenu';
 import { LogoutButton } from './LogoutButton';
+import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
 
 interface MobileDrawerProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface MobileDrawerProps {
 }
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) => {
+  const { session } = usePortalSession();
+  const displayName = formatUserDisplayName(session);
   // Prevent body scroll when drawer is open
   useEffect(() => {
     if (isOpen) {
@@ -66,6 +69,17 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
             <XMarkIcon className="w-6 h-6" />
           </button>
         </div>
+
+        {session && (
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+            <p className="text-sm font-medium text-gray-800 truncate">{displayName}</p>
+            {session.armoire ? (
+              <p className="text-xs text-gray-500">Armoire {session.armoire.no_serie} · distant</p>
+            ) : (
+              <p className="text-xs text-gray-400">{session.user.email}</p>
+            )}
+          </div>
+        )}
 
         {/* Navigation */}
         <nav className="px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">

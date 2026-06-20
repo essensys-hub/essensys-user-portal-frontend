@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import {
   ShieldCheckIcon,
   FireIcon,
@@ -10,9 +10,9 @@ import {
   Cog6ToothIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/outline';
-import { CardSummary } from '../components/UI';
+import { CardSummary, PortalContextPanel } from '../components/UI';
 import { useLastAction } from '../hooks';
-import { fetchGatewayOnline } from '../api/portalApi';
+import { usePortalSession } from '../context/PortalSessionContext';
 
 const formatActionInfo = (actionType: string | null | undefined, actionInfo: string | null | undefined): string => {
   if (actionInfo) return actionInfo;
@@ -22,13 +22,8 @@ const formatActionInfo = (actionType: string | null | undefined, actionInfo: str
 
 export const DashboardPage: React.FC = () => {
   const { lastAction, loading, error, refetch } = useLastAction();
-  const [gatewayOnline, setGatewayOnline] = useState(false);
-
-  useEffect(() => {
-    fetchGatewayOnline().then(setGatewayOnline);
-    const t = setInterval(() => fetchGatewayOnline().then(setGatewayOnline), 30000);
-    return () => clearInterval(t);
-  }, []);
+  const { session } = usePortalSession();
+  const gatewayOnline = session?.gateway?.online ?? false;
 
   const lastActionDate = lastAction?.timestamp ? new Date(lastAction.timestamp) : undefined;
   const lastActionText = lastAction
@@ -44,8 +39,11 @@ export const DashboardPage: React.FC = () => {
         </p>
         <p className={`mt-2 inline-block text-sm px-3 py-1 rounded-full ${gatewayOnline ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700'}`}>
           Gateway {gatewayOnline ? 'en ligne' : 'hors ligne'}
+          {session?.armoire?.remote && ' · Armoire en pilotage distant'}
         </p>
       </div>
+
+      <PortalContextPanel />
 
       {lastAction && (
         <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">

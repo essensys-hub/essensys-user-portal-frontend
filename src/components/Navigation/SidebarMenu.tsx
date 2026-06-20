@@ -12,6 +12,7 @@ import {
   Cog6ToothIcon,
 } from '@heroicons/react/24/outline';
 import { LogoutButton } from './LogoutButton';
+import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
 
 interface NavItem {
   to: string;
@@ -32,6 +33,10 @@ const navItems: NavItem[] = [
 ];
 
 export const SidebarMenu: React.FC = () => {
+  const { session } = usePortalSession();
+  const displayName = formatUserDisplayName(session);
+  const armoire = session?.armoire;
+
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200 shadow-sm">
       {/* Logo */}
@@ -67,6 +72,18 @@ export const SidebarMenu: React.FC = () => {
 
       {/* Footer */}
       <div className="px-3 py-4 border-t border-gray-200 space-y-2">
+        {session && (
+          <div className="px-3 py-2 mb-1 rounded-lg bg-gray-50 border border-gray-100">
+            <p className="text-xs font-medium text-gray-800 truncate" title={displayName}>{displayName}</p>
+            {armoire ? (
+              <p className="text-xs text-gray-500 truncate" title={armoire.no_serie}>
+                Armoire {armoire.no_serie}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-400">Aucune armoire liée</p>
+            )}
+          </div>
+        )}
         <LogoutButton />
         <p className="px-3 text-xs text-gray-500">Mon Essensys v1.2.0</p>
       </div>

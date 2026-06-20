@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { DashboardProvider } from './context/DashboardContext';
+import { PortalSessionProvider } from './context/PortalSessionContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { MainLayout } from './layouts';
 import { LinkGate } from './components/LinkGate';
@@ -22,6 +23,7 @@ captureTokenFromURL();
 
 function PortalRoutes() {
   return (
+    <PortalSessionProvider>
     <DashboardProvider>
       <ThemeProvider>
         <BrowserRouter basename="/portal">
@@ -44,6 +46,7 @@ function PortalRoutes() {
         </BrowserRouter>
       </ThemeProvider>
     </DashboardProvider>
+    </PortalSessionProvider>
   );
 }
 
