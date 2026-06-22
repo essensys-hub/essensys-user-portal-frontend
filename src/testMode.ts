@@ -7,9 +7,6 @@ export function isTestModeEnabled(): boolean {
   if (typeof window === 'undefined') {
     return false;
   }
-  if (new URLSearchParams(window.location.search).get('test') === '1') {
-    return true;
-  }
   return sessionStorage.getItem(STORAGE_KEY) === '1';
 }
 

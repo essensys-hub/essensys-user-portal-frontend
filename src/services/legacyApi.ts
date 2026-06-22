@@ -6,6 +6,8 @@ import { getToken } from '../api/portalApi';
 import { chunkInjectionParams } from '../heating/injectLimits';
 import type { InjectionProgressEvent } from '../heating/injectionProgress';
 import type { ScheduleSyncEvent } from '../heating/scheduleSync';
+import { isTestModeEnabled, testModeHeaders, withTestModeQuery } from '../testMode';
+import { parseInjectionResult } from '../injectionResult';
 
 export interface InjectionBatchResult {
   totalParams: number;
@@ -33,12 +35,15 @@ export interface LegacyMapping {
 
 const portalHeaders = (): HeadersInit => {
   const token = getToken();
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const base = testModeHeaders({ 'Content-Type': 'application/json' });
+  const headers = new Headers(base);
   if (token) {
-    headers.Authorization = `Bearer ${token}`;
+    headers.set('Authorization', `Bearer ${token}`);
   }
   return headers;
 };
+
+const injectUrl = (path: string): string => withTestModeQuery(`/api/portal${path}`);
 
 const handleAuthError = (response: Response): void => {
   if (response.status === 401) {
@@ -46,8 +51,8 @@ const handleAuthError = (response: Response): void => {
   }
 };
 
-export const sendInjection = async (k: number, v: string): Promise<void> => {
-  const response = await fetch('/api/portal/inject', {
+export const sendInjection = async (k: number, v: string): Promise<'live' | 'dry_run'> => {
+  const response = await fetch(injectUrl('/inject'), {
     method: 'POST',
     headers: portalHeaders(),
     body: JSON.stringify({ k, v: String(v) }),
@@ -57,6 +62,17 @@ export const sendInjection = async (k: number, v: string): Promise<void> => {
     const text = await response.text().catch(() => '');
     throw new Error(text || `Injection failed (${response.status})`);
   }
+  const data = await response.json().catch(() => null);
+  const result = parseInjectionResult(data);
+  if (result.kind === 'dry_run') {
+    if (!isTestModeEnabled()) {
+      throw new Error(
+        'Commande bloquée en dry-run alors que le mode test est désactivé — vérifiez Paramètres.',
+      );
+    }
+    return 'dry_run';
+  }
+  return 'live';
 };
 
 /** Envoie plusieurs indices (découpés côté serveur ; un batch par tranche ≤30 côté UI). */
@@ -87,7 +103,7 @@ export const sendInjectionBatch = async (
       indexMax,
     });
 
-    const response = await fetch('/api/portal/inject/batch', {
+    const response = await fetch(injectUrl('/inject/batch'), {
       method: 'POST',
       headers: portalHeaders(),
       body: JSON.stringify({ params: chunk.map(({ k, v }) => ({ k, v: String(v) })) }),
