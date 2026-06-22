@@ -39,14 +39,6 @@ export const portalRegressionClient: RegressionClient = {
     return data.slots ?? [];
   },
 
-  async launchScenarioDryRun(slot) {
-    const res = await fetch(withDryRunQuery(`/api/portal/scenarios/${slot}/launch`), {
-      method: 'POST',
-      headers: authHeaders(),
-    });
-    return parseDryRun(res);
-  },
-
   async readExchange(keys) {
     const res = await fetch(
       withDryRunQuery(`/api/portal/exchange?keys=${keys.join(',')}`),

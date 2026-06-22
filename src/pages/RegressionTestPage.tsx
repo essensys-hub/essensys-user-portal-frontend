@@ -71,8 +71,8 @@ export const RegressionTestPage: React.FC = () => {
         >
           <div className="space-y-4">
             <p className="text-sm text-gray-600">
-              Les tests utilisent <code className="text-xs bg-gray-100 px-1 rounded">/api/portal/*</code> en
-              dry-run — validation hub sans commande vers l&apos;armoire distante.
+              Validation hub sans forward gateway — chevet Petite Chambre 3 (k=613, v=64) uniquement.
+              Échec si <code className="text-xs bg-gray-100 px-1 rounded">guid</code> présent (ordre live).
             </p>
             <div className="flex flex-wrap gap-3 items-center">
               <ActionButton
