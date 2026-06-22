@@ -50,6 +50,9 @@ export const launchScenario = async (slot: number): Promise<string> => {
   const res = await portalFetch(`${prefix}/${slot}/launch`, { method: 'POST' });
   if (!res.ok) throw new Error(await res.text());
   const data = await res.json();
+  if (data.dry_run && data.status === 'test_ok') {
+    return `test-ok-${slot}`;
+  }
   return data.guid as string;
 };
 

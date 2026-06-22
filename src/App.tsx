@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { DashboardProvider } from './context/DashboardContext';
 import { PortalSessionProvider } from './context/PortalSessionContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { TestModeProvider } from './context/TestModeContext';
 import { MainLayout } from './layouts';
 import { LinkGate } from './components/LinkGate';
 import { captureTokenFromURL, fetchLinkStatus, getToken, logout } from './api/portalApi';
@@ -24,6 +25,7 @@ captureTokenFromURL();
 
 function PortalRoutes() {
   return (
+    <TestModeProvider>
     <PortalSessionProvider>
     <DashboardProvider>
       <ThemeProvider>
@@ -49,6 +51,7 @@ function PortalRoutes() {
       </ThemeProvider>
     </DashboardProvider>
     </PortalSessionProvider>
+    </TestModeProvider>
   );
 }
 

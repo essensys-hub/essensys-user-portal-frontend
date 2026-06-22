@@ -1,4 +1,5 @@
 import { noticePortalError } from '../observability/newrelic';
+import { testModeHeaders, withTestModeQuery } from '../testMode';
 
 const TOKEN_KEY = 'essensys_token';
 
@@ -24,13 +25,14 @@ export const captureTokenFromURL = (): void => {
 
 export const portalFetch = async (path: string, init: RequestInit = {}): Promise<Response> => {
   const token = getToken();
-  const headers = new Headers(init.headers);
+  const headers = new Headers(testModeHeaders(init.headers));
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
   }
   headers.set('Content-Type', 'application/json');
+  const url = withTestModeQuery(`/api/portal${path}`);
   try {
-    const res = await fetch(`/api/portal${path}`, { ...init, headers });
+    const res = await fetch(url, { ...init, headers });
     if (res.status >= 500) {
       noticePortalError(new Error(`HTTP ${res.status}`), path, res.status);
     }
