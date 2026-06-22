@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Cog6ToothIcon, CheckCircleIcon, ShieldCheckIcon, ExclamationTriangleIcon, ServerStackIcon, ArrowTopRightOnSquareIcon, ChartBarIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { Cog6ToothIcon, CheckCircleIcon, ShieldCheckIcon, ExclamationTriangleIcon, ServerStackIcon, ArrowTopRightOnSquareIcon, ChartBarIcon, BeakerIcon } from '@heroicons/react/24/outline';
 import { PageHeader, ControlCard, ActionButton, PortalContextPanel } from '../components/UI';
 import { useTheme } from '../context/ThemeContext';
 import { useTestMode } from '../context/TestModeContext';
@@ -228,6 +229,31 @@ export const SettingsPage: React.FC = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </ControlCard>
+
+        {/* Regression tests */}
+        <ControlCard
+          title="Tests de non-régression"
+          description="Smoke tests API dry-run depuis le portail"
+        >
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 p-3 bg-teal-50 border border-teal-200 rounded-lg">
+              <BeakerIcon className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-medium text-teal-800">Validation sans forward gateway</p>
+                <p className="text-xs text-teal-700 mt-1">
+                  Lance inject, scénarios et lecture exchange via le hub portail en mode test.
+                </p>
+              </div>
+            </div>
+            <Link
+              to="/admin/regression"
+              className="inline-flex items-center gap-2 px-4 py-2.5 bg-teal-600 text-white text-sm font-medium rounded-lg hover:bg-teal-700 transition-colors"
+            >
+              <BeakerIcon className="w-4 h-4" />
+              Ouvrir les tests
+            </Link>
           </div>
         </ControlCard>
 

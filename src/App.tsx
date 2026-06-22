@@ -19,6 +19,7 @@ import {
   NotificationsPage,
   SettingsPage,
   ScenariosPage,
+  RegressionTestPage,
 } from './pages';
 
 captureTokenFromURL();
@@ -44,6 +45,7 @@ function PortalRoutes() {
               <Route path="/sprinkler" element={<SprinklerPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/admin/regression" element={<RegressionTestPage />} />
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Route>
           </Routes>

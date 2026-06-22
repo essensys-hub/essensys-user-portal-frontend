@@ -11,6 +11,7 @@ import {
   BellIcon,
   Cog6ToothIcon,
   BoltIcon,
+  ClipboardDocumentCheckIcon,
 } from '@heroicons/react/24/outline';
 import { LogoutButton } from './LogoutButton';
 import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
@@ -20,6 +21,10 @@ interface NavItem {
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
 }
+
+const adminNavItems: NavItem[] = [
+  { to: '/admin/regression', icon: ClipboardDocumentCheckIcon, label: 'Tests non-régression' },
+];
 
 const navItems: NavItem[] = [
   { to: '/dashboard', icon: HomeIcon, label: 'Tableau de bord' },
@@ -70,6 +75,28 @@ export const SidebarMenu: React.FC = () => {
             {item.label}
           </NavLink>
         ))}
+
+        <div className="pt-4 mt-4 border-t border-gray-200">
+          <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+            Administration
+          </p>
+          {adminNavItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-essensys-primary text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`
+              }
+            >
+              <item.icon className="w-5 h-5 mr-3 flex-shrink-0" />
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
       </nav>
 
       {/* Footer */}
@@ -93,5 +120,5 @@ export const SidebarMenu: React.FC = () => {
   );
 };
 
-export { navItems };
+export { navItems, adminNavItems };
 export type { NavItem };

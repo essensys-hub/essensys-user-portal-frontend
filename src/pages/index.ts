@@ -8,4 +8,5 @@ export { SprinklerPage } from './SprinklerPage';
 export { NotificationsPage } from './NotificationsPage';
 export { SettingsPage } from './SettingsPage';
 export { ScenariosPage } from './ScenariosPage';
+export { RegressionTestPage } from './RegressionTestPage';
 export { UniFiProtectPage } from './UniFiProtectPage';
