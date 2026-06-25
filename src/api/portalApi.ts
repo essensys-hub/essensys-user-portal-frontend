@@ -9,17 +9,30 @@ export const getToken = (): string | null =>
   || localStorage.getItem('adminToken')
   || sessionStorage.getItem('adminToken');
 
-/** Persist OAuth token from URL (?token=...) when redirect lands on /portal/. */
+/**
+ * Persist OAuth token from the URL fragment (#token=...&role=...) after a
+ * provider redirect. The token is delivered in the fragment (not the query
+ * string) so it is never sent to the server, written to access logs, or leaked
+ * via the Referer header. A legacy ?token= query is still accepted for
+ * backward compatibility and stripped immediately.
+ */
 export const captureTokenFromURL = (): void => {
-  const params = new URLSearchParams(window.location.search);
-  const urlToken = params.get('token');
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const queryParams = new URLSearchParams(window.location.search);
+  const urlToken = hashParams.get('token') || queryParams.get('token');
   if (!urlToken) {
     return;
   }
   sessionStorage.setItem('adminToken', urlToken);
-  params.delete('token');
-  const qs = params.toString();
-  const next = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+  const role = hashParams.get('role') || queryParams.get('role');
+  if (role) {
+    sessionStorage.setItem('adminRole', role);
+  }
+  // Strip both the fragment and any legacy ?token= from the visible URL.
+  queryParams.delete('token');
+  queryParams.delete('role');
+  const qs = queryParams.toString();
+  const next = `${window.location.pathname}${qs ? `?${qs}` : ''}`;
   window.history.replaceState({}, '', next);
 };
 
