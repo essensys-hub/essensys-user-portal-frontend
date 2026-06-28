@@ -1,9 +1,11 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const demoRoot = process.env.VITE_DEMO_ROOT === 'true';
+
 export default defineConfig({
   plugins: [react()],
-  base: '/portal/',
+  base: demoRoot ? '/' : '/portal/',
   build: {
     outDir: 'dist',
   },

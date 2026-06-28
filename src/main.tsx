@@ -4,7 +4,12 @@ import App from './App';
 import { initNewRelic } from './observability/newrelic';
 import './index.css';
 
-initNewRelic();
+if (import.meta.env.VITE_DEMO_MODE === 'true') {
+  const { setupMocks } = await import('./mockFetch');
+  setupMocks();
+} else {
+  initNewRelic();
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

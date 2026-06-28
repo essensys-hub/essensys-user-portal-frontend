@@ -22,42 +22,45 @@ import {
   RegressionTestPage,
 } from './pages';
 
+const demoMode = import.meta.env.VITE_DEMO_MODE === 'true';
+const demoRoot = import.meta.env.VITE_DEMO_ROOT === 'true';
+
 captureTokenFromURL();
 
-function PortalRoutes() {
+function PortalRoutes({ basename }: { basename?: string }) {
   return (
     <TestModeProvider>
-    <PortalSessionProvider>
-    <DashboardProvider>
-      <ThemeProvider>
-        <BrowserRouter basename="/portal">
-          <NewRelicPageTracker />
-          <Routes>
-            <Route element={<MainLayout />}>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/security" element={<SecurityPage />} />
-              <Route path="/heating" element={<HeatingPage />} />
-              <Route path="/lighting" element={<LightingPage />} />
-              <Route path="/scenarios" element={<ScenariosPage />} />
-              <Route path="/shutters" element={<ShuttersPage />} />
-              <Route path="/water-heater" element={<WaterHeaterPage />} />
-              <Route path="/sprinkler" element={<SprinklerPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
-              <Route path="/admin/regression" element={<RegressionTestPage />} />
-              <Route path="*" element={<Navigate to="/dashboard" replace />} />
-            </Route>
-          </Routes>
-        </BrowserRouter>
-      </ThemeProvider>
-    </DashboardProvider>
-    </PortalSessionProvider>
+      <PortalSessionProvider>
+        <DashboardProvider>
+          <ThemeProvider>
+            <BrowserRouter basename={basename}>
+              {!demoMode && <NewRelicPageTracker />}
+              <Routes>
+                <Route element={<MainLayout />}>
+                  <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<DashboardPage />} />
+                  <Route path="/security" element={<SecurityPage />} />
+                  <Route path="/heating" element={<HeatingPage />} />
+                  <Route path="/lighting" element={<LightingPage />} />
+                  <Route path="/scenarios" element={<ScenariosPage />} />
+                  <Route path="/shutters" element={<ShuttersPage />} />
+                  <Route path="/water-heater" element={<WaterHeaterPage />} />
+                  <Route path="/sprinkler" element={<SprinklerPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/settings" element={<SettingsPage />} />
+                  <Route path="/admin/regression" element={<RegressionTestPage />} />
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Route>
+              </Routes>
+            </BrowserRouter>
+          </ThemeProvider>
+        </DashboardProvider>
+      </PortalSessionProvider>
     </TestModeProvider>
   );
 }
 
-function App() {
+function AppGated() {
   const [access, setAccess] = useState<boolean | null>(null);
 
   const refreshAccess = useCallback(() => {
@@ -68,7 +71,7 @@ function App() {
 
   useEffect(() => {
     refreshAccess();
-  }, []);
+  }, [refreshAccess]);
 
   if (access === null) {
     return (
@@ -100,7 +103,16 @@ function App() {
     );
   }
 
-  return <PortalRoutes />;
+  return <PortalRoutes basename="/portal" />;
+}
+
+function App() {
+  if (demoMode) {
+    const routerBasename = demoRoot ? undefined : '/portal';
+    return <PortalRoutes basename={routerBasename} />;
+  }
+
+  return <AppGated />;
 }
 
 export default App;
