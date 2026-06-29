@@ -21,7 +21,7 @@ const formatActionInfo = (actionType: string | null | undefined, actionInfo: str
 };
 
 export const DashboardPage: React.FC = () => {
-  const { lastAction, loading, error, refetch } = useLastAction();
+  const { lastAction, loading, polling, error, refetch } = useLastAction();
   const { session } = usePortalSession();
   const gatewayOnline = session?.gateway?.online ?? false;
 
@@ -58,7 +58,12 @@ export const DashboardPage: React.FC = () => {
                 )}
               </p>
               <p className="text-xs text-green-600 mt-1">
-                GUID: {lastAction.guid} • {lastAction.isDone ? 'Exécutée' : 'En attente'}
+                GUID: {lastAction.guid} •{' '}
+                {lastAction.isDone
+                  ? 'Exécutée'
+                  : polling
+                    ? 'En attente — suivi auto (~2 s)'
+                    : 'En attente'}
               </p>
             </div>
             <button
