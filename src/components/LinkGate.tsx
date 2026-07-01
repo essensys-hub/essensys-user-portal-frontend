@@ -5,6 +5,7 @@ import {
   submitLinkRequest,
   type LinkStatusResponse,
 } from '../api/portalApi';
+import { supportLoginUrl } from '../siteOrigins';
 
 interface LinkGateProps {
   onAccessGranted?: () => void;
@@ -78,7 +79,7 @@ export const LinkGate = ({ onAccessGranted }: LinkGateProps) => {
         <p className="text-gray-600">
           Connectez-vous avec votre compte Essensys pour déposer une demande de liaison.
         </p>
-        <a href="/login?return=/portal/" className="text-essensys-primary font-medium">
+        <a href={supportLoginUrl()} className="text-essensys-primary font-medium">
           Se connecter
         </a>
       </div>

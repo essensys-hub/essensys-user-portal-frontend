@@ -1,4 +1,5 @@
 import { noticePortalError } from '../observability/newrelic';
+import { supportLoginUrl } from '../siteOrigins';
 import { testModeHeaders, withTestModeQuery } from '../testMode';
 
 const TOKEN_KEY = 'essensys_token';
@@ -163,5 +164,5 @@ export const clearAuth = (): void => {
 /** Déconnexion → page login support-site avec retour portail. */
 export const logout = (): void => {
   clearAuth();
-  window.location.href = '/login?return=/portal/';
+  window.location.href = supportLoginUrl();
 };

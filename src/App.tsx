@@ -7,6 +7,7 @@ import { TestModeProvider } from './context/TestModeContext';
 import { MainLayout } from './layouts';
 import { LinkGate } from './components/LinkGate';
 import { captureTokenFromURL, fetchLinkStatus, getToken, logout } from './api/portalApi';
+import { portalRouterBasename } from './siteOrigins';
 import { NewRelicPageTracker } from './observability/NewRelicPageTracker';
 import {
   DashboardPage,
@@ -23,7 +24,6 @@ import {
 } from './pages';
 
 const demoMode = import.meta.env.VITE_DEMO_MODE === 'true';
-const demoRoot = import.meta.env.VITE_DEMO_ROOT === 'true';
 
 captureTokenFromURL();
 
@@ -103,13 +103,12 @@ function AppGated() {
     );
   }
 
-  return <PortalRoutes basename="/portal" />;
+  return <PortalRoutes basename={portalRouterBasename()} />;
 }
 
 function App() {
   if (demoMode) {
-    const routerBasename = demoRoot ? undefined : '/portal';
-    return <PortalRoutes basename={routerBasename} />;
+    return <PortalRoutes basename={portalRouterBasename()} />;
   }
 
   return <AppGated />;

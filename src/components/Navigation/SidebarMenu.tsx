@@ -49,7 +49,7 @@ export const SidebarMenu: React.FC = () => {
       {/* Logo */}
       <div className="flex items-center h-16 px-6 border-b border-gray-200">
         <img 
-          src="/portal/images/logosml.png" 
+          src={`${import.meta.env.BASE_URL}images/logosml.png`}
           alt="Essensys Portail" 
           className="h-8"
           onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
