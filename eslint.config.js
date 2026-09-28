@@ -20,6 +20,9 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+      // React Compiler readiness rule; the project doesn't use the compiler
+      // yet and it conflicts with the common fetch-on-mount effect pattern.
+      'react-hooks/set-state-in-effect': 'off',
     },
   },
 );
