@@ -18,6 +18,40 @@ const defaultConfig: BackendConfig = {
   port: '443',
 };
 
+const ThemeOption = ({
+  value,
+  label,
+  color,
+  theme,
+  setTheme,
+}: {
+  value: Theme;
+  label: string;
+  color: string;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+}) => (
+  <button
+    onClick={() => setTheme(value)}
+    className={`
+      relative p-3 rounded-lg border-2 text-left transition-all
+      ${theme === value
+        ? 'border-essensys-primary ring-1 ring-essensys-primary'
+        : 'border-transparent hover:border-gray-200'
+      }
+      bg-opacity-10
+    `}
+  >
+    <div className={`h-8 w-full rounded mb-2 ${color} border`}></div>
+    <span className={`text-sm font-medium ${theme === value ? 'text-essensys-primary' : 'text-gray-600'}`}>
+      {label}
+    </span>
+    {theme === value && (
+      <CheckCircleIcon className="absolute top-2 right-2 w-4 h-4 text-essensys-primary" />
+    )}
+  </button>
+);
+
 export const SettingsPage: React.FC = () => {
   const [config, setConfig] = useState<BackendConfig>(defaultConfig);
   const [saved, setSaved] = useState(false);
@@ -49,28 +83,6 @@ export const SettingsPage: React.FC = () => {
 
   const { theme, setTheme } = useTheme();
   const { enabled: testMode, setEnabled: setTestMode } = useTestMode();
-
-  const ThemeOption = ({ value, label, color }: { value: Theme; label: string; color: string }) => (
-    <button
-      onClick={() => setTheme(value)}
-      className={`
-        relative p-3 rounded-lg border-2 text-left transition-all
-        ${theme === value
-          ? 'border-essensys-primary ring-1 ring-essensys-primary'
-          : 'border-transparent hover:border-gray-200'
-        }
-        bg-opacity-10
-      `}
-    >
-      <div className={`h-8 w-full rounded mb-2 ${color} border`}></div>
-      <span className={`text-sm font-medium ${theme === value ? 'text-essensys-primary' : 'text-gray-600'}`}>
-        {label}
-      </span>
-      {theme === value && (
-        <CheckCircleIcon className="absolute top-2 right-2 w-4 h-4 text-essensys-primary" />
-      )}
-    </button>
-  );
 
   return (
     <div>
@@ -168,21 +180,29 @@ export const SettingsPage: React.FC = () => {
               value="light"
               label="Clair"
               color="bg-white border-gray-200"
+              theme={theme}
+              setTheme={setTheme}
             />
             <ThemeOption
               value="dark"
               label="Sombre"
               color="bg-slate-900 border-slate-700"
+              theme={theme}
+              setTheme={setTheme}
             />
             <ThemeOption
               value="starwars"
               label="Star Wars"
               color="bg-black border-red-900"
+              theme={theme}
+              setTheme={setTheme}
             />
             <ThemeOption
               value="startrek"
               label="Star Trek"
               color="bg-black border-blue-500"
+              theme={theme}
+              setTheme={setTheme}
             />
           </div>
         </ControlCard>
