@@ -27,10 +27,14 @@ export function assertNoArmoire(url: string, method = "GET", dryRun = false): vo
   }
 }
 
+interface GuardedRequestInit extends RequestInit {
+  dryRun?: boolean;
+}
+
 /** fetch encapsulé : refuse toute mutation armoire. À utiliser dans tout plugin. */
-export function guardedFetch(input: string, init?: RequestInit): Promise<Response> {
+export function guardedFetch(input: string, init?: GuardedRequestInit): Promise<Response> {
   const method = (init?.method || "GET").toUpperCase();
-  const dryRun = Boolean((init as any)?.dryRun);
+  const dryRun = Boolean(init?.dryRun);
   assertNoArmoire(input, method, dryRun);
   return fetch(input, init);
 }
