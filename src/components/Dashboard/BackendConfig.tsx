@@ -1,25 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const DEFAULT_DNS = 'mon.essensys.fr';
 const DEFAULT_PORT = '80';
 
 export const BackendConfig: React.FC = () => {
-    const [dns, setDns] = useState(DEFAULT_DNS);
-    const [port, setPort] = useState(DEFAULT_PORT);
+    const [dns, setDns] = useState(() => localStorage.getItem('essensys_backend_dns') || DEFAULT_DNS);
+    const [port, setPort] = useState(() => localStorage.getItem('essensys_backend_port') || DEFAULT_PORT);
     const [isEditing, setIsEditing] = useState(false);
-
-    // Charger la configuration depuis localStorage au démarrage
-    useEffect(() => {
-        const savedDns = localStorage.getItem('essensys_backend_dns');
-        const savedPort = localStorage.getItem('essensys_backend_port');
-        
-        if (savedDns) {
-            setDns(savedDns);
-        }
-        if (savedPort) {
-            setPort(savedPort);
-        }
-    }, []);
 
     // Sauvegarder la configuration dans localStorage
     const saveConfig = () => {
