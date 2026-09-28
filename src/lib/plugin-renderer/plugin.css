@@ -1,0 +1,526 @@
+/* Styles du renderer générique de plugin. Consommés à l'identique par les deux
+   frontends jumeaux. Toutes les couleurs passent par les tokens Essensys
+   (--essensys-*), donc thèmes clair/sombre gérés par l'app hôte. */
+
+.ess-plugin {
+  font-family: var(--font, ui-sans-serif, system-ui, sans-serif);
+  color: var(--essensys-text-main, #111827);
+  background: var(--essensys-bg-card, #fff);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 14px;
+  padding: 14px 15px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+}
+
+.ess-plugin header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ess-plugin__title,
+.ess-plugin h3 {
+  font-size: 13px;
+  font-weight: 650;
+  margin: 0;
+}
+
+.ess-plugin__primary {
+  font-size: 26px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  margin-top: 8px;
+}
+
+.ess-plugin__stale {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--essensys-warning, #f59e0b);
+  background: color-mix(in srgb, var(--essensys-warning, #f59e0b) 15%, transparent);
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.ess-plugin__ro {
+  font-size: 10px;
+  color: var(--essensys-text-muted, #6b7280);
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+.ess-plugin__metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+  margin: 12px 0 0;
+}
+
+.ess-plugin__metric dt {
+  font-size: 11px;
+  color: var(--essensys-text-muted, #6b7280);
+  font-weight: 600;
+}
+
+.ess-plugin__metric dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.ess-plugin--off {
+  color: var(--essensys-text-muted, #6b7280);
+}
+.ess-plugin--off p {
+  margin: 4px 0 0;
+  font-size: 12px;
+}
+
+/* ---------- Dashboard riche (descriptor.dashboard) ---------- */
+
+.ess-dash {
+  margin-top: 12px;
+  --ess-track: var(--essensys-track, #eef1f5);
+  --ess-grid-line: var(--essensys-grid-line, #eceef1);
+}
+
+.ess-dash__cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 780px) {
+  .ess-dash__cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ess-kpi {
+  background: var(--essensys-bg-card, #fff);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  padding: 16px 17px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ess-kpi__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ess-kpi__label {
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--essensys-text-faint, #9ca3af);
+}
+
+.ess-kpi__chip {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.ess-kpi__value {
+  font-size: 27px;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.ess-kpi__value small {
+  font-size: 13px;
+  color: var(--essensys-text-muted, #6b7280);
+  font-weight: 600;
+  margin-left: 3px;
+}
+
+.ess-kpi__sub {
+  font-size: 12px;
+  color: var(--essensys-text-muted, #6b7280);
+  min-height: 15px;
+}
+.ess-kpi__sub b {
+  font-variant-numeric: tabular-nums;
+}
+
+.ess-dash__lower {
+  display: grid;
+  grid-template-columns: 1.05fr 1.6fr;
+  gap: 14px;
+  margin-top: 14px;
+}
+@media (max-width: 860px) {
+  .ess-dash__lower {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ess-panel-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 15px 18px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+.ess-panel-hd h4 {
+  margin: 0;
+  font-size: 14.5px;
+  letter-spacing: -0.01em;
+}
+
+.ess-gauge,
+.ess-chart {
+  background: var(--essensys-bg-card, #fff);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+}
+
+.ess-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 20px;
+}
+
+.ess-gauge__wrap {
+  position: relative;
+  width: 210px;
+  max-width: 66%;
+  margin: 6px auto 2px;
+}
+.ess-gauge__wrap svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.ess-gauge__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.ess-gauge__val {
+  font-size: 34px;
+  font-weight: 780;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.ess-gauge__lab {
+  font-size: 11px;
+  color: var(--essensys-text-muted, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.ess-gauge__legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.ess-gauge__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--essensys-text-muted, #6b7280);
+  font-weight: 600;
+}
+.ess-gauge__legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.ess-chart {
+  padding-bottom: 10px;
+}
+.ess-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.ess-chart__empty {
+  margin: 24px 18px;
+  font-size: 13px;
+  color: var(--essensys-text-muted, #6b7280);
+}
+
+.ess-chart__toolbar {
+  padding: 0 18px;
+}
+
+.ess-chart__ranges {
+  display: inline-flex;
+  gap: 4px;
+  margin: 8px 0;
+  padding: 3px;
+  background: var(--essensys-bg-page, #f8f8f8);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 9px;
+}
+.ess-chart__ranges button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 4px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  color: var(--essensys-text-muted, #6b7280);
+}
+.ess-chart__ranges button.is-active {
+  background: var(--essensys-primary, #2563eb);
+  color: #fff;
+}
+
+.ess-chart__meta {
+  display: flex;
+  gap: 22px;
+  padding: 0 18px 14px;
+  flex-wrap: wrap;
+}
+.ess-chart__stat-v {
+  font-size: 19px;
+  font-weight: 720;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.ess-chart__stat-v small {
+  font-size: 12px;
+  color: var(--essensys-text-muted, #6b7280);
+}
+.ess-chart__stat-l {
+  font-size: 11.5px;
+  color: var(--essensys-text-muted, #6b7280);
+}
+
+/* ---------- Bascule Tableau / Schéma ---------- */
+
+.ess-plugin__views {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: auto;
+  padding: 3px;
+  background: var(--essensys-bg-page, #f8f8f8);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 9px;
+}
+.ess-plugin__views button {
+  border: 0;
+  background: transparent;
+  color: var(--essensys-text-muted, #6b7280);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  padding: 4px 11px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: 0.18s;
+}
+.ess-plugin__views button:hover {
+  color: var(--essensys-text-main, #111827);
+}
+.ess-plugin__views button.is-active {
+  background: var(--essensys-primary, #2563eb);
+  color: #fff;
+  box-shadow: 0 4px 10px -4px color-mix(in srgb, var(--essensys-primary, #2563eb) 60%, transparent);
+}
+
+/* ---------- Schéma de flux ---------- */
+
+.ess-flow {
+  position: relative;
+  background: var(--essensys-bg-card, #fff);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05), 0 8px 24px -12px rgba(16, 24, 40, 0.12);
+  padding: 6px;
+  overflow: hidden;
+}
+.ess-flow svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.ess-flow__dash {
+  stroke-dasharray: 7 9;
+  animation: ess-dashmove 1.1s linear infinite;
+}
+.ess-flow__dash--rev {
+  animation-direction: reverse;
+}
+@keyframes ess-dashmove {
+  to {
+    stroke-dashoffset: -32;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ess-flow__dash {
+    stroke-dasharray: none;
+    animation: none;
+  }
+}
+
+.ess-flow__legend {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.ess-flow__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--essensys-text-muted, #6b7280);
+  font-weight: 600;
+}
+.ess-flow__legend i {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+/* ---------- Gestionnaire de plugins (Paramètres) ---------- */
+
+.ess-pm__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ess-pm__item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--essensys-bg-card, #fff);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  border-radius: 12px;
+  padding: 13px 15px;
+}
+.ess-pm__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 14px;
+  flex-wrap: wrap;
+}
+.ess-pm__version {
+  font-size: 11px;
+  font-weight: 650;
+  color: var(--essensys-text-muted, #6b7280);
+  background: var(--essensys-bg-page, #f3f4f6);
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  padding: 1px 7px;
+  border-radius: 999px;
+}
+.ess-pm__badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--essensys-text-muted, #6b7280);
+  background: color-mix(in srgb, var(--essensys-text-muted, #6b7280) 12%, transparent);
+}
+.ess-pm__badge--on {
+  color: var(--essensys-success, #16a34a);
+  background: color-mix(in srgb, var(--essensys-success, #16a34a) 14%, transparent);
+}
+.ess-pm__ro {
+  font-size: 10.5px;
+  color: var(--essensys-text-faint, #9ca3af);
+}
+.ess-pm__desc {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--essensys-text-muted, #6b7280);
+  max-width: 60ch;
+}
+.ess-pm__meta {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--essensys-text-faint, #9ca3af);
+}
+.ess-pm__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.ess-pm__actions button {
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 650;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--essensys-border, #e2e8f0);
+  background: var(--essensys-bg-card, #fff);
+  color: var(--essensys-text-main, #111827);
+  cursor: pointer;
+  transition: 0.15s;
+}
+.ess-pm__actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ess-pm__actions .ess-pm__primary {
+  background: var(--essensys-primary, #2563eb);
+  border-color: var(--essensys-primary, #2563eb);
+  color: #fff;
+}
+.ess-pm__actions .ess-pm__danger {
+  color: var(--essensys-danger, #dc2626);
+  border-color: color-mix(in srgb, var(--essensys-danger, #dc2626) 35%, var(--essensys-border, #e2e8f0));
+}
+.ess-pm__confirm {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--essensys-text-muted, #6b7280);
+}
+.ess-pm__note {
+  margin: 12px 2px 0;
+  font-size: 12px;
+  color: var(--essensys-text-muted, #6b7280);
+}
+.ess-pm__error {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  color: var(--essensys-danger, #dc2626);
+}
