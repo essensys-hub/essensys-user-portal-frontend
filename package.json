@@ -12,7 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@newrelic/browser-agent": "^1.316.0",
-    "react": "^19.2.0",
+    "react": "^19.3.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.18.0"
   },
@@ -20,7 +20,7 @@
     "@eslint/js": "^9.39.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^24.10.1",
-    "@types/react": "^19.2.5",
+    "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.5.2",
