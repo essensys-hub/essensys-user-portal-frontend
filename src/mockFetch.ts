@@ -44,6 +44,16 @@ export function setupMocks() {
           linked_gateway_id: 'gw-demo',
         },
         gateway: { id: 'gw-demo', online: true, hostname: 'demo-gateway' },
+        // Armoire fictive (guide utilisateur, portal-user-guide-2026-10-006) : IP de la
+        // plage réservée à la documentation (RFC 5737), aucun équipement réel.
+        armoire: {
+          id: 1,
+          no_serie: 'DEMO-0001',
+          ip: '192.0.2.10',
+          geo_location: 'Maison de démonstration',
+          last_seen: new Date().toISOString(),
+          remote: true,
+        },
       });
     }
 
@@ -79,10 +89,10 @@ export function setupMocks() {
         message: 'Success',
         lastAction: {
           id: 1,
-          guid: 'mock-guid',
-          machineId: 99,
-          actionType: 'mock_type',
-          actionInfo: 'Mock action executed',
+          guid: 'demo-0001',
+          machineId: 1,
+          actionType: 'lighting',
+          actionInfo: 'Éclairage — Salon allumé',
           isDone: true,
           timestamp: new Date().toISOString(),
           indexes: [],

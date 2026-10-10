@@ -1,0 +1,55 @@
+# Sommaire du guide utilisateur (portal-user-guide-2026-10-006).
+# L'ordre de cette liste est celui du sommaire publié sur www.essensys.fr/guide.
+title: Guide du portail mon.essensys.fr
+pages:
+  - slug: premiers-pas
+    title: Premiers pas
+    summary: Se connecter, lier son armoire et envoyer une première commande.
+  - slug: connexion
+    title: Connexion et mots de passe
+    summary: Se connecter, retrouver un mot de passe oublié, changer un mot de passe temporaire.
+    screen: www.essensys.fr/login
+  - slug: tableau-de-bord
+    title: Tableau de bord
+    summary: L'état de votre installation et l'accès à toutes les fonctions.
+    screen: /dashboard
+  - slug: eclairage
+    title: Éclairage
+    summary: Allumer et éteindre les lumières, pièce par pièce ou toutes ensemble.
+    screen: /lighting
+  - slug: volets
+    title: Volets et stores
+    summary: Ouvrir et fermer les volets roulants et les stores.
+    screen: /shutters
+  - slug: chauffage
+    title: Chauffage
+    summary: Planning de la semaine et modes immédiats, zone par zone.
+    screen: /heating
+  - slug: chauffe-eau
+    title: Chauffe-eau
+    summary: Choisir le mode de fonctionnement du cumulus.
+    screen: /water-heater
+  - slug: arrosage
+    title: Arrosage
+    summary: Arrosage automatique ou manuel du jardin.
+    screen: /sprinkler
+  - slug: scenarios
+    title: Scénarios
+    summary: Lancer « Je sors », « Je pars en vacances » et vos scénarios personnalisés.
+    screen: /scenarios
+  - slug: securite
+    title: Sécurité
+    summary: Activer et désactiver l'alarme avec votre code.
+    screen: /security
+  - slug: notifications
+    title: Notifications
+    summary: Alertes par SMS et par email (bientôt disponibles).
+    screen: /notifications
+  - slug: reglages
+    title: Réglages
+    summary: Mode test, apparence et informations sur votre installation.
+    screen: /settings
+  - slug: profil-signalements
+    title: Profil et signalements
+    summary: Vos informations, la liaison de votre armoire et le signalement d'un problème.
+    screen: www.essensys.fr/profile

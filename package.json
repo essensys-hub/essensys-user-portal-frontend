@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docs:screenshots": "playwright test --config docs/user-guide/playwright.config.ts",
+    "docs:check": "node docs/user-guide/check.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -18,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@playwright/test": "1.61.1",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
