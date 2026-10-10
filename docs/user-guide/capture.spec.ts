@@ -20,7 +20,12 @@ function locate(page: Page, target: Target): Locator {
   return page.getByRole(target.role, { name: target.name, exact: typeof target.name === 'string' }).first();
 }
 
+// Horloge figée : les dates affichées (dernière action, dernière activité) ne changent pas
+// d'une capture à l'autre, donc une interface identique donne des images identiques.
+const FROZEN_NOW = new Date('2026-10-10T09:00:00+02:00');
+
 async function guard(page: Page, external: string[]) {
+  await page.clock.setFixedTime(FROZEN_NOW);
   await page.route('**/*', async (route) => {
     const url = new URL(route.request().url());
     if (url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') {
