@@ -14,8 +14,8 @@ Sur **www.essensys.fr**, une fois connecté, appuyez sur **Profil** en haut de l
 
 1. **Mes appareils** : liez votre compte à votre **armoire** et à votre **passerelle**. Seuls les appareils de votre réseau sont proposés : faites cette étape **chez vous, sur votre Wi-Fi**. Appuyez ensuite sur **Enregistrer**.
 2. **Modifier mes informations** : prénom, nom et mot de passe.
-3. **Mes signalements** : l'état de vos signalements (en attente d'envoi, ouvert, résolu, clos).
-4. **Gestion des données (RGPD)** : exporter vos données ou supprimer votre compte.
+3. **Gestion des données (RGPD)** : exporter vos données ou supprimer votre compte.
+4. **Mes signalements** : l'état de vos signalements (en attente d'envoi, ouvert, résolu, clos), avec un lien vers GitHub pour les bugs.
 
 ## Signaler un problème
 
