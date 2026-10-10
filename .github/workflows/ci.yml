@@ -17,3 +17,22 @@ jobs:
       - run: npm install
       - run: npm run lint
       - run: npm run build
+
+  # Captures du guide utilisateur (portal-user-guide-2026-10-006) : mode démo, aucune armoire.
+  # Échoue si un repère du guide disparaît de l'interface ou si une requête sort de localhost.
+  guide-screenshots:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run docs:screenshots
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: guide-screenshots
+          path: docs/user-guide/images/
+          retention-days: 30
