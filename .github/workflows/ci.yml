@@ -30,6 +30,8 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
       - run: npm run docs:screenshots
+      - name: Cohérence du guide (sommaire, images, numéros ↔ repères)
+        run: npm run docs:check
       - uses: actions/upload-artifact@v7
         if: always()
         with:

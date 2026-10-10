@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "docs:screenshots": "playwright test --config docs/user-guide/playwright.config.ts"
+    "docs:screenshots": "playwright test --config docs/user-guide/playwright.config.ts",
+    "docs:check": "node docs/user-guide/check.mjs"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
