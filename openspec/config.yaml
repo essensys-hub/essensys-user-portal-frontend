@@ -1,0 +1,6 @@
+schema: spec-driven
+
+context: |
+  Essensys — portail utilisateur cloud mon.essensys.fr (React 19, Vite, TypeScript). Appelle essensys-user-portal-backend sur /api/portal/* avec un JWT Bearer.
+  Gouvernance : essensys-feature-lifecycle/claude/GOVERNANCE.md (ticket GitHub Project #6, OpenSpec, /checkup, tests NR-*, jamais d'armoire réelle en test). Conventional commits référençant l'issue (#n). Français.
+  Commandes domotiques = injection k/v dans la table d'échange (indices legacy IoT : ne jamais les modifier).
