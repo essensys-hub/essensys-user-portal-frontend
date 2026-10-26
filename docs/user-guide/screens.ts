@@ -33,7 +33,7 @@ export const screens: Screen[] = [
     route: '/dashboard',
     title: 'Tableau de bord',
     markers: [
-      { n: 1, target: { text: /Gateway en ligne · Armoire/ } },
+      { n: 1, target: { text: /Armoire en ligne · pilotage distant/ } },
       { n: 2, target: { role: 'heading', name: 'Armoire Essensys' } },
       { n: 3, target: { text: /Dernière action/ } },
       { n: 4, target: { text: /Rappel/ } },

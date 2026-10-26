@@ -12,15 +12,24 @@ declare global {
   }
 }
 
+/** Variantes de la session simulée (voir `DemoSessionVariant` dans src/mockFetch.ts). */
+export type SessionVariant =
+  | 'gateway-online'
+  | 'gateway-offline-armoire-seen'
+  | 'all-offline'
+  | 'no-gateway-seen'
+  | 'no-gateway-old'
+  | 'none';
+
 /**
  * Garde no-armoire : toute requête hors localhost est bloquée, et le fetch simulé du mode démo
- * est enveloppé pour enregistrer les écritures (POST/PUT) vers /api/portal. Avec
- * `gatewayOffline`, la session simulée annonce une armoire hors ligne ; avec `withoutState`, la
+ * est enveloppé pour enregistrer les écritures (POST/PUT) vers /api/portal. `session` choisit la
+ * session simulée (avec ou sans gateway, armoire vue ou ancienne) ; avec `withoutState`, la
  * table d'échange ne renvoie pas l'indice 440 (installation sans gateway).
  */
 export async function noArmoire(
   page: Page,
-  opts: { gatewayOffline?: boolean; withoutState?: boolean } = {},
+  opts: { session?: SessionVariant; withoutState?: boolean } = {},
 ): Promise<string[]> {
   const external: string[] = [];
   await page.route('**/*', (route) => {
@@ -31,7 +40,10 @@ export async function noArmoire(
     }
     return route.continue();
   });
-  await page.addInitScript(({ offline, withoutState }: { offline: boolean; withoutState: boolean }) => {
+  await page.addInitScript((variant: string) => {
+    sessionStorage.setItem('essensys_demo_session', variant);
+  }, opts.session ?? 'gateway-online');
+  await page.addInitScript(({ withoutState }: { withoutState: boolean }) => {
     const native = window.fetch.bind(window);
     const passthrough = new WeakSet<object>();
     let inner: typeof window.fetch = native;
@@ -47,11 +59,6 @@ export async function noArmoire(
       const marked: RequestInit = { ...(init ?? {}) };
       passthrough.add(marked);
       const res = await inner(input, marked);
-      if (offline && url.includes('/api/portal/session')) {
-        const data = await res.json();
-        if (data.gateway) data.gateway.online = false;
-        return new Response(JSON.stringify(data), { status: 200, headers: { 'Content-Type': 'application/json' } });
-      }
       if (withoutState && url.includes('/api/portal/exchange')) {
         const data = await res.json();
         data.values = (data.values ?? []).filter((row: { k: number }) => row.k !== 440);
@@ -66,7 +73,7 @@ export async function noArmoire(
         inner = v;
       },
     });
-  }, { offline: opts.gatewayOffline ?? false, withoutState: opts.withoutState ?? false });
+  }, { withoutState: opts.withoutState ?? false });
   return external;
 }
 

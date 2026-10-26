@@ -13,6 +13,7 @@ import {
 import { CardSummary, PortalContextPanel } from '../components/UI';
 import { useLastAction } from '../hooks';
 import { usePortalSession } from '../context/PortalSessionContext';
+import { isArmoireOnline } from '../api/portalApi';
 
 const formatActionInfo = (actionType: string | null | undefined, actionInfo: string | null | undefined): string => {
   if (actionInfo) return actionInfo;
@@ -23,7 +24,7 @@ const formatActionInfo = (actionType: string | null | undefined, actionInfo: str
 export const DashboardPage: React.FC = () => {
   const { lastAction, loading, polling, error, refetch } = useLastAction();
   const { session } = usePortalSession();
-  const gatewayOnline = session?.gateway?.online ?? false;
+  const armoireOnline = isArmoireOnline(session);
 
   const lastActionDate = lastAction?.timestamp ? new Date(lastAction.timestamp) : undefined;
   const lastActionText = lastAction
@@ -37,9 +38,9 @@ export const DashboardPage: React.FC = () => {
         <p className="mt-1 text-sm text-gray-500">
           Portail distant Essensys — pilotage via cloud.
         </p>
-        <p className={`mt-2 inline-block text-sm px-3 py-1 rounded-full ${gatewayOnline ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700'}`}>
-          Gateway {gatewayOnline ? 'en ligne' : 'hors ligne'}
-          {session?.armoire?.remote && ' · Armoire en pilotage distant'}
+        <p className={`mt-2 inline-block text-sm px-3 py-1 rounded-full ${armoireOnline ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-700'}`}>
+          Armoire {armoireOnline ? 'en ligne' : 'hors ligne'}
+          {session?.armoire?.remote && ' · pilotage distant'}
         </p>
       </div>
 

@@ -2,6 +2,61 @@ import { handleMockScenarioRequest } from './mockScenarios';
 
 const originalFetch = window.fetch;
 
+
+/**
+ * Variantes de la session simulée (armoire-online-sans-gateway-2026-10-012), choisies par
+ * `sessionStorage['essensys_demo_session']` : avec ou sans gateway, armoire vue ou ancienne.
+ */
+export type DemoSessionVariant =
+  | 'gateway-online'
+  | 'gateway-offline-armoire-seen'
+  | 'all-offline'
+  | 'no-gateway-seen'
+  | 'no-gateway-old'
+  | 'none';
+
+const demoSessionVariant = (): DemoSessionVariant => {
+  try {
+    return (sessionStorage.getItem('essensys_demo_session') as DemoSessionVariant | null) ?? 'gateway-online';
+  } catch {
+    return 'gateway-online';
+  }
+};
+
+const demoSession = (variant: DemoSessionVariant) => {
+  const hasGateway = variant === 'gateway-online' || variant === 'gateway-offline-armoire-seen' || variant === 'all-offline';
+  const gatewayOnline = variant === 'gateway-online';
+  const armoireSeen = variant === 'gateway-online' || variant === 'gateway-offline-armoire-seen' || variant === 'no-gateway-seen';
+  const lastSeen = new Date(Date.now() - (armoireSeen ? 5_000 : 10 * 60_000)).toISOString();
+  return {
+    portal_access: true,
+    user: {
+      id: 1,
+      email: 'demo@essensys.fr',
+      first_name: 'Démo',
+      last_name: 'Portail',
+      role: 'user',
+      linked_gateway_id: hasGateway ? 'gw-demo' : null,
+    },
+    ...(hasGateway ? { gateway: { id: 'gw-demo', online: gatewayOnline, hostname: 'demo-gateway' } } : {}),
+    // Armoire fictive (guide utilisateur, portal-user-guide-2026-10-006) : IP de la
+    // plage réservée à la documentation (RFC 5737), aucun équipement réel.
+    ...(variant === 'none'
+      ? {}
+      : {
+          armoire: {
+            id: 1,
+            no_serie: 'DEMO-0001',
+            ip: '192.0.2.10',
+            geo_location: 'Maison de démonstration',
+            last_seen: lastSeen,
+            remote: true,
+            online: armoireSeen,
+          },
+        }),
+  };
+};
+
 export function setupMocks() {
   console.log('[MOCK] Portail demo — mocks actifs (zéro action armoire)');
 
@@ -33,28 +88,7 @@ export function setupMocks() {
     }
 
     if (url.includes('/api/portal/session') && method === 'GET') {
-      return jsonResponse({
-        portal_access: true,
-        user: {
-          id: 1,
-          email: 'demo@essensys.fr',
-          first_name: 'Démo',
-          last_name: 'Portail',
-          role: 'user',
-          linked_gateway_id: 'gw-demo',
-        },
-        gateway: { id: 'gw-demo', online: true, hostname: 'demo-gateway' },
-        // Armoire fictive (guide utilisateur, portal-user-guide-2026-10-006) : IP de la
-        // plage réservée à la documentation (RFC 5737), aucun équipement réel.
-        armoire: {
-          id: 1,
-          no_serie: 'DEMO-0001',
-          ip: '192.0.2.10',
-          geo_location: 'Maison de démonstration',
-          last_seen: new Date().toISOString(),
-          remote: true,
-        },
-      });
+      return jsonResponse(demoSession(demoSessionVariant()));
     }
 
     if (url.includes('/api/portal/inject') && method === 'POST') {

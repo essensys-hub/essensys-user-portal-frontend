@@ -47,7 +47,7 @@ test.describe('prises de sécurité', () => {
   });
 
   test('@nr NR-portal-frontend-8 commandes desactivees hors ligne', async ({ page }) => {
-    await noArmoire(page, { gatewayOffline: true });
+    await noArmoire(page, { session: 'all-offline' });
     await page.goto('/security');
     const card = page.getByTestId('security-outlets');
     await expect(card.getByText('Armoire hors ligne')).toBeVisible();

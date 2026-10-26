@@ -12,7 +12,7 @@ Il s'ouvre après la connexion. Vous y revenez à tout moment avec **Tableau de 
 
 ## L'écran en détail
 
-1. **État de la connexion** : « Gateway en ligne » signifie que votre installation est joignable. « Armoire en pilotage distant » confirme que les commandes peuvent être envoyées depuis le portail.
+1. **État de la connexion** : « Armoire en ligne » signifie que votre installation est joignable (avec ou sans boîtier gateway). « pilotage distant » confirme que les commandes peuvent être envoyées depuis le portail.
 2. **Armoire Essensys** : le numéro de série de votre armoire, sa dernière activité et l'état de la passerelle (gateway).
 3. **Dernière action** : la dernière commande envoyée, avec sa date et son état (« Exécutée » quand l'armoire l'a traitée). Le bouton circulaire à droite rafraîchit l'affichage.
 4. **Rappel « boucle ouverte »** : le portail affiche la dernière commande envoyée, pas forcément l'état réel des équipements.
@@ -32,7 +32,7 @@ Le portail existe aussi en thème sombre (voir [Réglages](reglages.md)) :
 
 | Message | Que faire |
 |---|---|
-| Gateway hors ligne | Votre installation n'est pas joignable : vérifiez la box internet et l'alimentation de la passerelle. Les commandes ne partiront pas tant qu'elle est hors ligne. |
+| Armoire hors ligne | Votre installation n'est pas joignable : vérifiez la box internet et l'alimentation de l'armoire (et de la passerelle si vous en avez une). Les commandes ne partiront pas tant qu'elle est hors ligne. |
 | Aucune armoire liée à ce compte | Liez votre armoire depuis votre profil (voir [Premiers pas](premiers-pas.md)). |
 
 ## Un problème ?

@@ -4,6 +4,7 @@ import { PageHeader } from '../components/UI';
 import { ScenarioButtonGrid, ScenarioEditorDrawer } from '../components/Scenarios';
 import { useScenarios } from '../hooks/useScenarios';
 import { usePortalSession } from '../context/PortalSessionContext';
+import { isArmoireOnline } from '../api/portalApi';
 import {
   fetchScenario,
   fetchScenarioBitmasks,
@@ -16,10 +17,10 @@ import {
 
 export const ScenariosPage: React.FC = () => {
   const { session } = usePortalSession();
-  const gatewayOnline = session?.gateway?.online ?? false;
+  const armoireOnline = isArmoireOnline(session);
 
   const { slots, loading, error, message, launchingSlot, lastLaunched, launch } = useScenarios({
-    disabled: !gatewayOnline,
+    disabled: !armoireOnline,
   });
 
   const [editorSlot, setEditorSlot] = useState<number | null>(null);
@@ -30,10 +31,10 @@ export const ScenariosPage: React.FC = () => {
   const [editorMessage, setEditorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (gatewayOnline) {
+    if (armoireOnline) {
       fetchScenarioBitmasks().then(setBitmasks).catch(console.error);
     }
-  }, [gatewayOnline]);
+  }, [armoireOnline]);
 
   const openEditor = useCallback(async (slot: number) => {
     setEditorSlot(slot);
@@ -103,9 +104,9 @@ export const ScenariosPage: React.FC = () => {
         icon={BoltIcon}
       />
 
-      {!gatewayOnline && (
+      {!armoireOnline && (
         <div className="rounded-lg px-4 py-3 text-sm bg-amber-50 text-amber-800">
-          Gateway hors ligne — lancement et édition indisponibles.
+          Armoire hors ligne — lancement et édition indisponibles.
         </div>
       )}
 
@@ -131,7 +132,7 @@ export const ScenariosPage: React.FC = () => {
         <ScenarioButtonGrid
           slots={slots}
           launchingSlot={launchingSlot}
-          disabled={!gatewayOnline}
+          disabled={!armoireOnline}
           onLaunch={launch}
           onEdit={openEditor}
         />
