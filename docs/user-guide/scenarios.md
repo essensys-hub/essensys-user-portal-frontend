@@ -15,7 +15,7 @@ Menu **Scénarios** (ordinateur) ou menu **Plus** (téléphone).
 1. **Dernier scénario lancé** : le dernier scénario envoyé à l'armoire.
 2. **La carte du scénario** : son nom et son emplacement dans l'armoire (« Slot »). Le badge « Dernier » repère le dernier lancé.
 3. **Lancer** : exécute le scénario tout de suite.
-4. **Éditer** : ouvre un panneau qui détaille ce que fait le scénario (lumières, volets, chauffage…). Vous pouvez y modifier les réglages puis **Enregistrer**, le **Lancer**, revenir au réglage d'usine avec **Défaut firmware**, ou **Fermer** sans rien changer.
+4. **Éditer** : ouvre un panneau qui détaille ce que fait le scénario (lumières, volets, chauffage…). Vous pouvez y modifier les réglages puis **Enregistrer**, le **Lancer**, revenir au réglage d'usine avec **Défaut firmware**, ou **Fermer** sans rien changer. Le choix **Prises de sécurité** (ne rien faire, couper, rétablir) permet par exemple à « Je sors » de couper les prises de sécurité.
 
 > **Bon à savoir** : un scénario agit sur plusieurs équipements à la fois. Avant de le lancer à distance, vérifiez que personne n'est gêné à la maison (volets qui se ferment, chauffage qui baisse…).
 

@@ -5,3 +5,5 @@ dist/
 dist-guide/
 test-results/
 playwright-report/
+dist-e2e/
+test-results/
