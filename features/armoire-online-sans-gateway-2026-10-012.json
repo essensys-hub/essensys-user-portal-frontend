@@ -55,19 +55,18 @@
   },
   "userguide": {
     "pages": [
-      "docs/user-guide/securite.md",
-      "docs/user-guide/scenarios.md"
+      "docs/user-guide/tableau-de-bord.md",
+      "docs/user-guide/premiers-pas.md"
     ],
     "language": "fr",
     "i18n_keys": [],
     "screenshots": [
-      "docs/user-guide/images/securite-desktop.png"
+      "docs/user-guide/images/tableau-de-bord-desktop.png"
     ]
   },
   "tests": {
     "playwright": [
-      "e2e/tests/security-outlets.spec.ts",
-      "docs/user-guide/capture.spec.ts"
+      "e2e/tests/armoire-online.spec.ts"
     ],
     "coverage_must_test": [
       "sans gateway armoire vue en ligne",

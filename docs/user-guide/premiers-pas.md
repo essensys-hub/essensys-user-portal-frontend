@@ -19,7 +19,7 @@ Pour piloter votre maison, votre compte doit être relié à **votre armoire Ess
 
 ## 3. Votre première commande
 
-1. Sur le tableau de bord, vérifiez que le badge indique **Gateway en ligne**.
+1. Sur le tableau de bord, vérifiez que le badge indique **Armoire en ligne**.
 2. Ouvrez **Éclairage**, choisissez une pièce et appuyez sur **Allumer**.
 3. Le portail confirme l'envoi. L'armoire exécute la commande en **quelques secondes**.
 

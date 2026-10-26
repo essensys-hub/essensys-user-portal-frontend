@@ -31,10 +31,10 @@ Motivation : voir `proposal.md`. État des lieux (2026-10-26) : le cloud calcule
 `isArmoireOnline(session)` dans `src/api/portalApi.ts` (ou un module `src/session/online.ts`) : `Boolean(session?.gateway?.online || session?.armoire?.online)`. Toutes les pages l'utilisent ; plus aucune lecture directe de `gateway.online` pour décider d'activer une commande.
 
 ### D2 — Libellés
-Le badge du tableau de bord passe de « Gateway en ligne » à « Armoire en ligne » / « Armoire hors ligne » quand il n'y a pas de gateway ; avec gateway, le texte actuel reste. `PortalContextPanel` affiche la gateway seulement s'il y en a une.
+Le badge du tableau de bord affiche toujours « Armoire en ligne » / « Armoire hors ligne » (suffixe « · pilotage distant ») au lieu de « Gateway en ligne » : avec une gateway hors ligne mais une armoire vue, « Gateway hors ligne » serait trompeur. `PortalContextPanel` garde sa ligne « Gateway … » (exacte), affichée seulement s'il y a une gateway. Guide utilisateur : `tableau-de-bord.md`, `premiers-pas.md` et captures.
 
 ### D3 — Tests `NR-portal-frontend-9`
-Playwright en mode démo, garde no-armoire, matrice desktop / iPhone / iPad : `mockFetch` sert une session choisie par un paramètre (cas A à F). Cas D = tableau de bord et Scénarios actifs, carte « Prises de sécurité » active.
+Playwright en mode démo, garde no-armoire, matrice desktop / iPhone / iPad : `mockFetch` sert une session choisie par `sessionStorage['essensys_demo_session']` (cas A à F ; le cas G, LAN, ne concerne pas ce portail). Cas D = tableau de bord et Scénarios actifs, carte « Prises de sécurité » active.
 
 ## Risks / Trade-offs
 

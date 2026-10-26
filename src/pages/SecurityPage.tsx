@@ -3,6 +3,7 @@ import { ShieldCheckIcon } from '@heroicons/react/24/outline';
 import { PageHeader, ControlCard, ActionButton } from '../components/UI';
 import { SecurityOutletsCard } from '../components/Security/SecurityOutletsCard';
 import { usePortalSession } from '../context/PortalSessionContext';
+import { isArmoireOnline } from '../api/portalApi';
 import { useTestMode } from '../context/TestModeContext';
 import { getExchangeValues, sendAlarmAction, sendInjectionBatch } from '../services/legacyApi';
 import { SECURITY_OUTLETS_STATE_INDEX } from '../security/securityOutlets';
@@ -115,7 +116,7 @@ export const SecurityPage: React.FC = () => {
         </ControlCard>
 
         <SecurityOutletsCard
-          online={session?.gateway?.online ?? false}
+          online={isArmoireOnline(session)}
           dryRun={testMode || import.meta.env.VITE_DEMO_MODE === 'true'}
           readState={readOutletsState}
           sendBatch={sendInjectionBatch}

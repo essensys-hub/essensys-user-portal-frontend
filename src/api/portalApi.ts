@@ -96,6 +96,8 @@ export interface PortalArmoireInfo {
   last_seen?: string;
   geo_location?: string;
   remote: boolean;
+  /** Dernier contact de l'armoire de 2 min au plus (armoire-online-sans-gateway-2026-10-012). */
+  online?: boolean;
 }
 
 export interface PortalSessionResponse {
@@ -104,6 +106,14 @@ export interface PortalSessionResponse {
   gateway?: PortalGatewayInfo | null;
   armoire?: PortalArmoireInfo | null;
 }
+
+/**
+ * Armoire en ligne : la gateway OU l'armoire elle-même a été vue depuis 2 min au plus.
+ * Une installation sans gateway n'a pas de bloc `gateway` : seul `armoire.online` compte (#37).
+ * Un champ absent (ancien backend) vaut faux.
+ */
+export const isArmoireOnline = (session: PortalSessionResponse | null | undefined): boolean =>
+  Boolean(session?.gateway?.online || session?.armoire?.online);
 
 export const fetchPortalSession = async (): Promise<PortalSessionResponse> => {
   const res = await portalFetch('/session');
