@@ -117,7 +117,10 @@ export const screens: Screen[] = [
       { n: 1, target: { text: 'Code alarme' } },
       { n: 2, target: { role: 'button', name: "Activer l'alarme" } },
       { n: 3, target: { role: 'button', name: "Désactiver l'alarme" } },
-      { n: 4, target: { text: 'Information' } },
+      { n: 4, target: { text: 'Prises pilotées' } },
+      { n: 5, target: { role: 'button', name: 'Couper' } },
+      { n: 6, target: { role: 'button', name: 'Rétablir' } },
+      { n: 7, target: { text: 'Information' } },
     ],
   },
   {
