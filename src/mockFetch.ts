@@ -1,4 +1,5 @@
 import { handleMockScenarioRequest } from './mockScenarios';
+import { LIGHT_TIMER_CATALOG, isLightTimerAdmin, isValidMinutes } from './lights/lightTimers';
 
 const originalFetch = window.fetch;
 
@@ -23,6 +24,29 @@ const demoSessionVariant = (): DemoSessionVariant => {
   }
 };
 
+/**
+ * Rôle de la session simulée (lumieres-temporisees-2026-11-003), choisi par
+ * `sessionStorage['essensys_demo_role']` : `admin_local` (défaut, propriétaire de la maison de
+ * démonstration) ou `user` (utilisateur simple : pas de réglage des temporisations).
+ */
+const demoRole = (): string => {
+  try {
+    return sessionStorage.getItem('essensys_demo_role') ?? 'admin_local';
+  } catch {
+    return 'admin_local';
+  }
+};
+
+/** Temporisations simulées (minutes, null = jamais lue) ; la page rechargée repart de cet état. */
+const demoLightTimers: Record<string, number | null> = {
+  dressing: 15,
+  wc1: null,
+  wc2: 0,
+  pieceserv: 60,
+  ann1: null,
+  ann2: 7,
+};
+
 const demoSession = (variant: DemoSessionVariant) => {
   const hasGateway = variant === 'gateway-online' || variant === 'gateway-offline-armoire-seen' || variant === 'all-offline';
   const gatewayOnline = variant === 'gateway-online';
@@ -35,7 +59,7 @@ const demoSession = (variant: DemoSessionVariant) => {
       email: 'demo@essensys.fr',
       first_name: 'Démo',
       last_name: 'Portail',
-      role: 'user',
+      role: demoRole(),
       linked_gateway_id: hasGateway ? 'gw-demo' : null,
     },
     ...(hasGateway ? { gateway: { id: 'gw-demo', online: gatewayOnline, hostname: 'demo-gateway' } } : {}),
@@ -89,6 +113,24 @@ export function setupMocks() {
 
     if (url.includes('/api/portal/session') && method === 'GET') {
       return jsonResponse(demoSession(demoSessionVariant()));
+    }
+
+    if (url.includes('/api/portal/lights/timers') && method === 'GET') {
+      return jsonResponse({
+        timers: LIGHT_TIMER_CATALOG.map((e) => ({ id: e.id, label: e.label, key: e.key, minutes: demoLightTimers[e.id] })),
+      });
+    }
+
+    const timerPut = url.match(/\/api\/portal\/admin\/lights\/timers\/([^/?]+)/);
+    if (timerPut && method === 'PUT') {
+      if (!isLightTimerAdmin(demoRole())) return jsonResponse({ error: 'forbidden' }, 403);
+      const id = decodeURIComponent(timerPut[1]);
+      if (!(id in demoLightTimers)) return jsonResponse({ error: 'unknown_light' }, 400);
+      const minutes = (init?.body ? JSON.parse(String(init.body)) : {}).minutes;
+      if (!isValidMinutes(minutes)) return jsonResponse({ error: 'invalid_minutes' }, 400);
+      // Aucune armoire : la valeur simulée est mise à jour en mémoire, rien n'est envoyé.
+      demoLightTimers[id] = minutes;
+      return jsonResponse({ id, minutes, status: 'queued' });
     }
 
     if (url.includes('/api/portal/inject') && method === 'POST') {

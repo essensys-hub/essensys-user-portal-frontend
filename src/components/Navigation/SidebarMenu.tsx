@@ -12,17 +12,22 @@ import {
   Cog6ToothIcon,
   BoltIcon,
   ClipboardDocumentCheckIcon,
+  ClockIcon,
 } from '@heroicons/react/24/outline';
 import { LogoutButton } from './LogoutButton';
 import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
+import { isLightTimerAdmin } from '../../lights/lightTimers';
 
 interface NavItem {
   to: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   label: string;
+  /** Visible seulement pour l'administrateur de l'armoire (le serveur reste seul juge). */
+  adminOnly?: boolean;
 }
 
 const adminNavItems: NavItem[] = [
+  { to: '/lighting/timers', icon: ClockIcon, label: 'Temporisations', adminOnly: true },
   { to: '/admin/regression', icon: ClipboardDocumentCheckIcon, label: 'Tests non-régression' },
 ];
 
@@ -39,10 +44,15 @@ const navItems: NavItem[] = [
   { to: '/settings', icon: Cog6ToothIcon, label: 'Paramètres' },
 ];
 
+/** Entrées de la section Administration visibles pour ce rôle. */
+const visibleAdminNavItems = (role: string | null | undefined): NavItem[] =>
+  adminNavItems.filter((item) => !item.adminOnly || isLightTimerAdmin(role));
+
 export const SidebarMenu: React.FC = () => {
   const { session } = usePortalSession();
   const displayName = formatUserDisplayName(session);
   const armoire = session?.armoire;
+  const adminItems = visibleAdminNavItems(session?.user?.role);
 
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-60 lg:fixed lg:inset-y-0 bg-white border-r border-gray-200 shadow-sm">
@@ -80,7 +90,7 @@ export const SidebarMenu: React.FC = () => {
           <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
             Administration
           </p>
-          {adminNavItems.map((item) => (
+          {adminItems.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
@@ -120,5 +130,5 @@ export const SidebarMenu: React.FC = () => {
   );
 };
 
-export { navItems, adminNavItems };
+export { navItems, adminNavItems, visibleAdminNavItems };
 export type { NavItem };
