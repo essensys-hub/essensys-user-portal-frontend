@@ -17,6 +17,10 @@ pages:
     title: Éclairage
     summary: Allumer et éteindre les lumières, pièce par pièce ou toutes ensemble.
     screen: /lighting
+  - slug: temporisations
+    title: Temporisations
+    summary: Régler au bout de combien de temps certaines lumières s'éteignent seules (administrateur).
+    screen: /lighting/timers
   - slug: volets
     title: Volets et stores
     summary: Ouvrir et fermer les volets roulants et les stores.

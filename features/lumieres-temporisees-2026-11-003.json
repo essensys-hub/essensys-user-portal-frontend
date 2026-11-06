@@ -1,0 +1,113 @@
+{
+  "$schema": "./schema/feature.schema.json",
+  "status": "proposed",
+  "owner": "nrineau",
+  "github": {
+    "issue": "essensys-hub/essensys-feature-lifecycle#45",
+    "project_item": null
+  },
+  "git": {
+    "branch": "feat/lumieres-temporisees-2026-11-003",
+    "pr_url": null
+  },
+  "openspec": {
+    "change_id": "lumieres-temporisees-2026-11-003",
+    "path": "openspec/changes/lumieres-temporisees-2026-11-003",
+    "proposal": "openspec/changes/lumieres-temporisees-2026-11-003/proposal.md",
+    "design": null,
+    "tasks": "openspec/changes/lumieres-temporisees-2026-11-003/tasks.md",
+    "specs": [
+      "openspec/changes/lumieres-temporisees-2026-11-003/specs/light-timers-clients/spec.md"
+    ]
+  },
+  "security": {
+    "sca_tool": "dependabot",
+    "dependabot_alerts_url": null,
+    "last_scan_at": null,
+    "cve_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "secret_scan": {
+      "status": "clean",
+      "tool": "gitleaks",
+      "last_scan_at": null
+    },
+    "muted_findings": [],
+    "threat_model_url": "../essensys-memory/openspec/changes/portal-user-guide-2026-10-006/design.md",
+    "owner_security": "nrineau"
+  },
+  "id": "lumieres-temporisees-2026-11-003",
+  "title": "Régler la temporisation des lumières depuis les apps et les portails",
+  "implementation": {
+    "paths": [
+      "src/lights/lightTimers.ts",
+      "src/lights/useLightTimers.ts",
+      "src/components/Lighting/LightTimerControl.tsx",
+      "src/pages/LightTimersPage.tsx",
+      "src/pages/LightingPage.tsx",
+      "src/components/Navigation/SidebarMenu.tsx",
+      "src/components/Navigation/MobileDrawer.tsx",
+      "src/services/legacyApi.ts",
+      "src/mockFetch.ts"
+    ],
+    "primary_surface": "react-user"
+  },
+  "userguide": {
+    "pages": [
+      "docs/user-guide/temporisations.md",
+      "docs/user-guide/eclairage.md"
+    ],
+    "language": "fr",
+    "i18n_keys": [],
+    "screenshots": [
+      "docs/user-guide/images/temporisations-desktop.png"
+    ]
+  },
+  "tests": {
+    "playwright": [
+      "e2e/tests/light-timers.spec.ts",
+      "e2e/tests/light-timers-logic.spec.ts"
+    ],
+    "coverage_must_test": [
+      "menu : les six lumieres et inconnue sans valeur",
+      "Dressing : meme valeur dans le menu et la fiche, valeur libre 7",
+      "valeur libre 300 et 0 refusees sans requete",
+      "masque pour un utilisateur simple",
+      "controles desactives hors ligne"
+    ],
+    "smoke_tags": [
+      "@nr",
+      "@docs"
+    ],
+    "ux_matrix": {
+      "required": true,
+      "devices": [
+        "desktop",
+        "iphone",
+        "ipad"
+      ],
+      "targets": [
+        "demo"
+      ],
+      "required_projects": [
+        "portal-desktop",
+        "portal-iphone",
+        "portal-ipad"
+      ],
+      "screenshots_required": true,
+      "visual_regression_required": true,
+      "no_armoire_required": true
+    }
+  },
+  "release": {
+    "changelog_entry": "Portail cloud : menu Temporisations et réglage dans la page Éclairage pour six lumières (#45).",
+    "target_tag": null,
+    "surfaces": [
+      "essensys-user-portal-frontend"
+    ],
+    "paths": []
+  }
+}

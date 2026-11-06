@@ -14,7 +14,7 @@ const errors = [];
 
 const index = fs.readFileSync(path.join(DIR, 'index.yml'), 'utf8');
 const slugs = [...index.matchAll(/^\s*- slug:\s*(\S+)/gm)].map((m) => m[1]);
-if (slugs.length !== 13) errors.push(`le sommaire doit compter 13 pages, il en compte ${slugs.length}`);
+if (slugs.length !== 14) errors.push(`le sommaire doit compter 14 pages, il en compte ${slugs.length}`);
 
 const screensSrc = fs.readFileSync(path.join(DIR, 'screens.ts'), 'utf8');
 const markerCount = {};
