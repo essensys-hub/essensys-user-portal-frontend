@@ -9,6 +9,8 @@ import { isArmoireOnline } from '../api/portalApi';
 import { LightTimerControl } from '../components/Lighting/LightTimerControl';
 import { formatMinutes, hasLightTimer, isLightTimerAdmin } from '../lights/lightTimers';
 import { useLightTimers } from '../lights/useLightTimers';
+import { LightNameEditor } from '../components/Lighting/LightNameEditor';
+import { useLightNames } from '../lights/useLightNames';
 
 interface Light {
   id: string;
@@ -70,6 +72,8 @@ export const LightingPage: React.FC = () => {
   const online = isArmoireOnline(session);
   const { timers, readValue, writeValue } = useLightTimers(timersAdmin);
   const [openTimer, setOpenTimer] = useState<string | null>(null);
+  const [openName, setOpenName] = useState<string | null>(null);
+  const { names, displayName, rename } = useLightNames();
 
   const handleLightAction = async (light: Light, action: 'on' | 'off') => {
     const loadingKey = `${light.id}-${action}`;
@@ -81,9 +85,9 @@ export const LightingPage: React.FC = () => {
       const index = action === 'on' ? light.onIndex : light.offIndex;
       const mode = await sendInjection(index, light.dvalue);
       if (mode === 'dry_run') {
-        setSuccess(`${light.name} : test OK (mode test — non envoyé à l'armoire)`);
+        setSuccess(`${displayName(light.id)} : test OK (mode test — non envoyé à l'armoire)`);
       } else {
-        setSuccess(`${light.name} : commande envoyée — l'armoire exécute sous ~5 s`);
+        setSuccess(`${displayName(light.id)} : commande envoyée — l'armoire exécute sous ~5 s`);
         void refetch();
       }
     } catch (e) {
@@ -148,15 +152,19 @@ export const LightingPage: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {lights.map((light) => {
           const timerOpen = timersAdmin && hasLightTimer(light.id) && openTimer === light.id;
+          const nameOpen = timersAdmin && openName === light.id;
+          const shownName = displayName(light.id);
           const timer = timers?.find((t) => t.id === light.id);
           return (
             <div
               key={light.id}
               data-testid={`light-${light.id}`}
-              className={`p-3 bg-gray-50 rounded-lg ${timerOpen ? 'sm:col-span-2' : ''}`}
+              className={`p-3 bg-gray-50 rounded-lg ${timerOpen || nameOpen ? 'sm:col-span-2' : ''}`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">{light.name}</span>
+                <span data-testid={`light-name-label-${light.id}`} className="text-sm font-medium text-gray-700">
+                  {shownName}
+                </span>
                 <div className="flex gap-2">
                   <ActionButton
                     label="Allumer"
@@ -176,6 +184,29 @@ export const LightingPage: React.FC = () => {
                   />
                 </div>
               </div>
+              {timersAdmin && (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    data-testid={`light-name-toggle-${light.id}`}
+                    aria-expanded={nameOpen}
+                    onClick={() => setOpenName(nameOpen ? null : light.id)}
+                    className="text-sm text-essensys-primary font-medium hover:underline"
+                  >
+                    {nameOpen ? 'Masquer le nom' : 'Renommer'}
+                  </button>
+                  {nameOpen && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <LightNameEditor
+                        id={light.id}
+                        current={shownName}
+                        customized={names[light.id] !== undefined}
+                        save={(name) => rename(light.id, name)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
               {timersAdmin && hasLightTimer(light.id) && (
                 <div className="mt-2">
                   <button
@@ -192,7 +223,7 @@ export const LightingPage: React.FC = () => {
                     <div className="mt-3 pt-3 border-t border-gray-200">
                       <LightTimerControl
                         id={light.id}
-                        label={light.name}
+                        label={shownName}
                         value={timer?.minutes ?? null}
                         online={online}
                         dryRun={testMode}
