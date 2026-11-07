@@ -46,7 +46,10 @@ export const LightTimersPage: React.FC = () => {
             </div>
           )}
           <ul className="space-y-6" data-testid="light-timers-list">
-            {effective.apply(LIGHT_TIMER_CATALOG).map((entry) => {
+            {(effective.reordered
+              ? effective.apply(LIGHT_TIMER_CATALOG)
+              : LIGHT_TIMER_CATALOG.filter((e) => effective.isActive(e.id))
+            ).map((entry) => {
               const timer = timers?.find((t) => t.id === entry.id);
               return (
                 <li key={entry.id} data-testid={`light-timers-row-${entry.id}`}>

@@ -95,4 +95,13 @@ test.describe('disposition des objets : logique', () => {
     expect(layoutErrorMessage('lights', 400, 'unknown_light')).toContain('inconnu');
     expect(layoutErrorMessage('lights', 400, 'invalid_layout')).toContain('refusée');
   });
+
+  test('@nr NR-portal-frontend-13 reordered : faux par defaut, desactivation seule et order complet identique au catalogue', () => {
+    expect(lightLayout().reordered).toBe(false);
+    expect(lightLayout(layoutOf([...LIGHT_IDS], ['wc2'])).reordered).toBe(false);
+    expect(lightLayout(layoutOf([], [])).reordered).toBe(false);
+    const swapped = [...LIGHT_IDS];
+    [swapped[8], swapped[9]] = [swapped[9], swapped[8]];
+    expect(lightLayout(layoutOf(swapped, [])).reordered).toBe(true);
+  });
 });

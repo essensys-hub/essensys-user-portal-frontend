@@ -38,6 +38,8 @@ export interface EffectiveLayout {
   /** Identifiants désactivés (inconnus ignorés). */
   disabled: ReadonlySet<string>;
   isActive: (id: string) => boolean;
+  /** Vrai si l'ordre effectif diffère de l'ordre du catalogue (et non si `order` est vide). */
+  reordered: boolean;
   /** Éléments d'un groupe (ou d'un écran sans groupe) : ordre effectif, désactivés retirés. */
   apply: <T extends { id: string }>(items: readonly T[]) => T[];
 }
@@ -64,6 +66,7 @@ export const effectiveLayout = (catalogue: readonly string[], layout: ObjectLayo
     ordered,
     disabled,
     isActive: (id) => !disabled.has(id),
+    reordered: ordered.some((id, i) => id !== catalogue[i]),
     apply: <T extends { id: string }>(items: readonly T[]) =>
       items
         .filter((it) => !disabled.has(it.id))

@@ -223,4 +223,41 @@ test.describe('affichage des lumieres et des volets', () => {
     const namePuts = (await recordedCalls(page)).filter((c) => c.method === 'PUT' && c.url.includes('/names/'));
     expect(namePuts).toHaveLength(1);
   });
+
+  const timerRows = (page: Page) =>
+    page.locator('[data-testid^="light-timers-row-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')!.replace('light-timers-row-', '')));
+
+  test('@nr NR-portal-frontend-13 Temporisations : ordre propre par defaut, desactivation seule, reordonnancement puis reset', async ({ page }) => {
+    await noArmoire(page);
+    await page.goto('/lighting/timers');
+    await expect(page.getByTestId('light-timers-row-dressing')).toBeVisible();
+    expect(await timerRows(page)).toEqual(['dressing', 'wc1', 'wc2', 'pieceserv', 'ann1', 'ann2']);
+
+  });
+
+  test('@nr NR-portal-frontend-13 Temporisations : desactivation seule (order complet) garde l ordre propre', async ({ page }) => {
+    await noArmoire(page);
+    const full = (await import('../../src/lights/lightLayout')).LIGHT_IDS;
+    await seed(page, { lights: { order: [...full], disabled: ['wc1'] } });
+    await page.goto('/lighting/timers');
+    await expect(page.getByTestId('light-timers-row-dressing')).toBeVisible();
+    expect(await timerRows(page)).toEqual(['dressing', 'wc2', 'pieceserv', 'ann1', 'ann2']);
+  });
+
+  test('@nr NR-portal-frontend-13 Temporisations : reordonnancement => ordre global filtre', async ({ page }) => {
+    await noArmoire(page);
+    // ann2 et wc2 remontes en tete ; wc1 desactive
+    await seed(page, { lights: { order: ['ann2', 'wc2'], disabled: ['wc1'] } });
+    await page.goto('/lighting/timers');
+    await expect(page.getByTestId('light-timers-row-dressing')).toBeVisible();
+    expect(await timerRows(page)).toEqual(['ann2', 'wc2', 'pieceserv', 'ann1', 'dressing']);
+  });
+
+  test('@nr NR-portal-frontend-13 Temporisations : reset (document vide) => ordre propre', async ({ page }) => {
+    await noArmoire(page);
+    await seed(page, { lights: { order: [], disabled: [] } });
+    await page.goto('/lighting/timers');
+    await expect(page.getByTestId('light-timers-row-dressing')).toBeVisible();
+    expect(await timerRows(page)).toEqual(['dressing', 'wc1', 'wc2', 'pieceserv', 'ann1', 'ann2']);
+  });
 });
