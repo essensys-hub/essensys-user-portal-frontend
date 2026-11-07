@@ -1,5 +1,6 @@
 import { handleMockScenarioRequest } from './mockScenarios';
 import { LIGHT_TIMER_CATALOG, isLightTimerAdmin, isValidMinutes } from './lights/lightTimers';
+import { LIGHT_NAME_CATALOG, validateLightName } from './lights/lightNames';
 
 const originalFetch = window.fetch;
 
@@ -45,6 +46,25 @@ const demoLightTimers: Record<string, number | null> = {
   pieceserv: 60,
   ann1: null,
   ann2: 7,
+};
+
+/**
+ * Noms personnalisés simulés (noms-lumieres-2026-11-004) : id → { name, version, updated_at }.
+ * `sessionStorage['essensys_demo_names']` = `unavailable` simule le stockage indisponible (503).
+ */
+const demoLightNames: Record<string, { name: string | null; version: number; updated_at: string | null }> = {};
+
+const demoNamesUnavailable = (): boolean => {
+  try {
+    return sessionStorage.getItem('essensys_demo_names') === 'unavailable';
+  } catch {
+    return false;
+  }
+};
+
+const demoLightName = (id: string, def: string) => {
+  const row = demoLightNames[id];
+  return { id, default: def, name: row?.name ?? null, version: row?.version ?? 0, updated_at: row?.updated_at ?? null };
 };
 
 const demoSession = (variant: DemoSessionVariant) => {
@@ -131,6 +151,33 @@ export function setupMocks() {
       // Aucune armoire : la valeur simulée est mise à jour en mémoire, rien n'est envoyé.
       demoLightTimers[id] = minutes;
       return jsonResponse({ id, minutes, status: 'queued' });
+    }
+
+    if (url.includes('/api/portal/lights/names') && method === 'GET') {
+      return jsonResponse({ lights: LIGHT_NAME_CATALOG.map((e) => demoLightName(e.id, e.default)) });
+    }
+
+    const namePut = url.match(/\/api\/portal\/admin\/lights\/names\/([^/?]+)/);
+    if (namePut && method === 'PUT') {
+      if (!isLightTimerAdmin(demoRole())) return jsonResponse({ error: 'forbidden' }, 403);
+      if (demoNamesUnavailable()) return jsonResponse({ error: 'names_unavailable' }, 503);
+      const id = decodeURIComponent(namePut[1]);
+      const entry = LIGHT_NAME_CATALOG.find((e) => e.id === id);
+      if (!entry) return jsonResponse({ error: 'unknown_light' }, 400);
+      const raw = (init?.body ? JSON.parse(String(init.body)) : {}).name;
+      let name: string | null = null;
+      if (raw !== null && raw !== undefined) {
+        const checked = typeof raw === 'string' ? validateLightName(raw) : null;
+        if (!checked || !checked.ok) return jsonResponse({ error: 'invalid_name' }, 400);
+        name = checked.name;
+      }
+      // Aucune armoire : le nom simulé est gardé en mémoire, rien n'est envoyé.
+      demoLightNames[id] = {
+        name,
+        version: (demoLightNames[id]?.version ?? 0) + 1,
+        updated_at: new Date().toISOString(),
+      };
+      return jsonResponse({ ...demoLightName(id, entry.default), status: 'saved' });
     }
 
     if (url.includes('/api/portal/inject') && method === 'POST') {

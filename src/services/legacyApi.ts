@@ -9,6 +9,8 @@ import type { ScheduleSyncEvent } from '../heating/scheduleSync';
 import { isTestModeEnabled, testModeHeaders, withTestModeQuery } from '../testMode';
 import { parseInjectionResult } from '../injectionResult';
 import { isValidMinutes, parseLightTimers, type LightTimer } from '../lights/lightTimers';
+import { lightNameErrorMessage, parseLightNames, type LightNameMap } from '../lights/lightNames';
+import { portalFetch } from '../api/portalApi';
 
 export interface InjectionBatchResult {
   totalParams: number;
@@ -266,4 +268,30 @@ export const setLightTimer = async (id: string, minutes: number): Promise<'queue
     return 'dry_run';
   }
   return 'queued';
+};
+
+/** Noms personnalisés des lumières (noms-lumieres-2026-11-004) : GET /api/portal/lights/names. */
+export const getLightNames = async (): Promise<LightNameMap> => {
+  const response = await portalFetch('/lights/names');
+  if (!response.ok) {
+    throw new Error(`Lecture des noms impossible (${response.status})`);
+  }
+  return parseLightNames(await response.json().catch(() => null));
+};
+
+/**
+ * Renomme une lumière : PUT /api/portal/admin/lights/names/{id}, corps {"name": "..."} ou
+ * {"name": null} (nom d'origine). Réservé à l'administrateur de l'armoire. N'écrit jamais dans l'armoire.
+ */
+export const setLightName = async (id: string, name: string | null): Promise<'saved' | 'dry_run'> => {
+  const response = await portalFetch(`/admin/lights/names/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ name }),
+  });
+  if (!response.ok) {
+    const data: { error?: string } | null = await response.json().catch(() => null);
+    throw new Error(lightNameErrorMessage(response.status, data?.error));
+  }
+  const data: { status?: string } | null = await response.json().catch(() => null);
+  return data?.status === 'dry_run' ? 'dry_run' : 'saved';
 };

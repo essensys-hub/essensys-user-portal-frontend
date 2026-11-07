@@ -1,0 +1,112 @@
+{
+  "$schema": "./schema/feature.schema.json",
+  "status": "proposed",
+  "owner": "nrineau",
+  "github": {
+    "issue": "essensys-hub/essensys-feature-lifecycle#41",
+    "project_item": "PVTI_lADODqt0Wc4BavHTzhGkOlI"
+  },
+  "git": {
+    "branch": "feat/noms-lumieres-2026-11-004",
+    "pr_url": null
+  },
+  "openspec": {
+    "change_id": "noms-lumieres-2026-11-004",
+    "path": "openspec/changes/noms-lumieres-2026-11-004",
+    "proposal": "openspec/changes/noms-lumieres-2026-11-004/proposal.md",
+    "design": null,
+    "tasks": "openspec/changes/noms-lumieres-2026-11-004/tasks.md",
+    "specs": [
+      "openspec/changes/noms-lumieres-2026-11-004/specs/light-names-clients/spec.md"
+    ]
+  },
+  "security": {
+    "sca_tool": "dependabot",
+    "dependabot_alerts_url": null,
+    "last_scan_at": null,
+    "cve_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "secret_scan": {
+      "status": "clean",
+      "tool": "gitleaks",
+      "last_scan_at": null
+    },
+    "muted_findings": [],
+    "threat_model_url": "../essensys-memory/openspec/changes/portal-user-guide-2026-10-006/design.md",
+    "owner_security": "nrineau"
+  },
+  "id": "noms-lumieres-2026-11-004",
+  "title": "Personnaliser le nom des lumières depuis les apps et les portails",
+  "implementation": {
+    "paths": [
+      "src/lights/lightNames.ts",
+      "src/lights/useLightNames.ts",
+      "src/components/Lighting/LightNameEditor.tsx",
+      "src/components/Dashboard/LightingControl.tsx",
+      "src/pages/LightingPage.tsx",
+      "src/pages/LightTimersPage.tsx",
+      "src/services/legacyApi.ts",
+      "src/mockFetch.ts"
+    ],
+    "primary_surface": "react-user"
+  },
+  "userguide": {
+    "pages": [
+      "docs/user-guide/eclairage.md",
+      "docs/user-guide/temporisations.md"
+    ],
+    "language": "fr",
+    "i18n_keys": [],
+    "screenshots": [
+      "docs/user-guide/images/eclairage-desktop.png"
+    ]
+  },
+  "tests": {
+    "playwright": [
+      "e2e/tests/light-names.spec.ts",
+      "e2e/tests/light-names-logic.spec.ts"
+    ],
+    "coverage_must_test": [
+      "Dressing renomme WC 3 : liste et Temporisations, puis remise a zero",
+      "41 caracteres refuse sans requete",
+      "non-administrateur : aucun champ de nom",
+      "lecture impossible : noms d origine",
+      "chevrons refuses avant envoi"
+    ],
+    "smoke_tags": [
+      "@nr",
+      "@docs"
+    ],
+    "ux_matrix": {
+      "required": true,
+      "devices": [
+        "desktop",
+        "iphone",
+        "ipad"
+      ],
+      "targets": [
+        "demo"
+      ],
+      "required_projects": [
+        "portal-desktop",
+        "portal-iphone",
+        "portal-ipad"
+      ],
+      "screenshots_required": true,
+      "visual_regression_required": true,
+      "no_armoire_required": true
+    }
+  },
+  "release": {
+    "changelog_entry": "Portail cloud : nom personnalisé des lumières, modifiable par l'administrateur de l'armoire (#41).",
+    "target_tag": null,
+    "surfaces": [
+      "essensys-user-portal-frontend"
+    ],
+    "paths": []
+  }
+}

@@ -16,7 +16,7 @@ Ce réglage est **réservé à l'administrateur de l'armoire**. Un autre utilisa
 
 ## L'écran en détail
 
-1. **Le nom de la lumière** : une carte par lumière, dans l'ordre Dressing, WC 1, WC 2, Service, Annexe 1, Annexe 2.
+1. **Le nom de la lumière** : tel qu'il s'affiche dans l'écran **[Éclairage](eclairage.md)** (le nom personnalisé s'il existe, sinon le nom d'origine). Une carte par lumière, dans l'ordre Dressing, WC 1, WC 2, Service, Annexe 1, Annexe 2.
 2. **Extinction automatique** : la durée actuellement réglée dans l'armoire, par exemple **7 min**, **1 h** ou **Jamais**. Si l'armoire ne l'a pas encore transmise, le portail affiche **inconnue**.
 3. **Les raccourcis** : **15 min**, **30 min**, **1 h** et **Jamais** (la lumière reste allumée jusqu'à ce que vous l'éteigniez).
 4. **Autre durée** : une durée libre, **de 1 à 255 minutes**. Pour ne jamais éteindre, utilisez **Jamais** plutôt que 0.

@@ -7,6 +7,7 @@ import { useTestMode } from '../context/TestModeContext';
 import { isArmoireOnline } from '../api/portalApi';
 import { LIGHT_TIMER_CATALOG, isLightTimerAdmin } from '../lights/lightTimers';
 import { useLightTimers } from '../lights/useLightTimers';
+import { useLightNames } from '../lights/useLightNames';
 
 export const LightTimersPage: React.FC = () => {
   const { session } = usePortalSession();
@@ -14,6 +15,7 @@ export const LightTimersPage: React.FC = () => {
   const admin = isLightTimerAdmin(session?.user?.role);
   const online = isArmoireOnline(session);
   const { timers, error, readValue, writeValue } = useLightTimers(admin);
+  const { displayName } = useLightNames();
 
   return (
     <div>
@@ -47,13 +49,13 @@ export const LightTimersPage: React.FC = () => {
               return (
                 <li key={entry.id} data-testid={`light-timers-row-${entry.id}`}>
                   <ControlCard
-                    title={entry.label}
+                    title={displayName(entry.id)}
                     description={timers ? "Durée avant extinction automatique" : 'Lecture…'}
                   >
                     {timers && (
                       <LightTimerControl
                         id={entry.id}
-                        label={entry.label}
+                        label={displayName(entry.id)}
                         value={timer?.minutes ?? null}
                         online={online}
                         dryRun={testMode}
