@@ -12,6 +12,7 @@ import { isValidMinutes, parseLightTimers, type LightTimer } from '../lights/lig
 import { lightNameErrorMessage, parseLightNames, type LightNameMap } from '../lights/lightNames';
 import { parseShutterNames, shutterNameErrorMessage, type ShutterNameMap } from '../shutters/shutterNames';
 import { portalFetch } from '../api/portalApi';
+import { layoutErrorMessage, parseLayout, type LayoutKind, type ObjectLayout } from '../layout/objectLayout';
 
 export interface InjectionBatchResult {
   totalParams: number;
@@ -321,4 +322,35 @@ export const setShutterName = async (id: string, name: string | null): Promise<'
   }
   const data: { status?: string } | null = await response.json().catch(() => null);
   return data?.status === 'dry_run' ? 'dry_run' : 'saved';
+};
+
+/**
+ * Disposition des objets (affichage-objets-2026-11-006) : GET /api/portal/{lights|shutters}/layout.
+ * Renvoie null au 404 (ancien cloud), à l'échec ou à une réponse illisible : le client garde sa
+ * dernière valeur, ou le catalogue complet dans l'ordre d'origine, sans message bloquant.
+ */
+export const getObjectLayout = async (kind: LayoutKind): Promise<ObjectLayout | null> => {
+  try {
+    const response = await portalFetch(`/${kind}/layout`);
+    if (!response.ok) return null;
+    return parseLayout(await response.json().catch(() => null));
+  } catch {
+    return null;
+  }
+};
+
+/**
+ * Écrit la disposition : PUT /api/portal/admin/{lights|shutters}/layout, corps `{order, disabled}`
+ * ou `{reset:true}`. Réservé à l'administrateur de l'armoire. N'écrit jamais dans l'armoire.
+ */
+export const putObjectLayout = async (
+  kind: LayoutKind,
+  body: { order: string[]; disabled: string[] } | { reset: true },
+): Promise<{ mode: 'saved' | 'dry_run'; layout: ObjectLayout | null }> => {
+  const response = await portalFetch(`/admin/${kind}/layout`, { method: 'PUT', body: JSON.stringify(body) });
+  const data: ({ status?: string; error?: string } & Record<string, unknown>) | null = await response
+    .json()
+    .catch(() => null);
+  if (!response.ok) throw new Error(layoutErrorMessage(kind, response.status, data?.error));
+  return { mode: data?.status === 'dry_run' ? 'dry_run' : 'saved', layout: parseLayout(data) };
 };

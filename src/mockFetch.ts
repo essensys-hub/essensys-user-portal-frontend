@@ -2,6 +2,8 @@ import { handleMockScenarioRequest } from './mockScenarios';
 import { LIGHT_TIMER_CATALOG, isLightTimerAdmin, isValidMinutes } from './lights/lightTimers';
 import { LIGHT_NAME_CATALOG, validateLightName } from './lights/lightNames';
 import { SHUTTER_NAME_CATALOG, validateShutterName } from './shutters/shutterNames';
+import { LIGHT_IDS } from './lights/lightLayout';
+import { SHUTTER_IDS } from './shutters/shutterLayout';
 
 const originalFetch = window.fetch;
 
@@ -81,6 +83,37 @@ const demoInjectLive = (): boolean => {
 const demoShutterName = (id: string, def: string) => {
   const row = demoShutterNames[id];
   return { id, default: def, name: row?.name ?? null, version: row?.version ?? 0, updated_at: row?.updated_at ?? null };
+};
+
+/**
+ * Dispositions simulées (affichage-objets-2026-11-006), par genre, gardées en mémoire de la page.
+ * `sessionStorage['essensys_demo_layout_seed']` = JSON `{"lights":{"order":[…],"disabled":[…]}}` donne
+ * l'état de départ ; `essensys_demo_layout` = `absent` simule un ancien cloud (404 sur la lecture).
+ */
+type DemoLayout = { order: string[]; disabled: string[]; version: number; updated_at: string | null };
+const demoLayouts: Partial<Record<'lights' | 'shutters', DemoLayout>> = {};
+
+const demoLayoutAbsent = (): boolean => {
+  try {
+    return sessionStorage.getItem('essensys_demo_layout') === 'absent';
+  } catch {
+    return false;
+  }
+};
+
+const demoLayout = (kind: 'lights' | 'shutters'): DemoLayout => {
+  let row = demoLayouts[kind];
+  if (!row) {
+    row = { order: [], disabled: [], version: 0, updated_at: null };
+    try {
+      const seed = JSON.parse(sessionStorage.getItem('essensys_demo_layout_seed') ?? 'null');
+      if (seed?.[kind]) row = { order: seed[kind].order ?? [], disabled: seed[kind].disabled ?? [], version: 1, updated_at: new Date().toISOString() };
+    } catch {
+      /* pas de graine */
+    }
+    demoLayouts[kind] = row;
+  }
+  return row;
 };
 
 const demoSession = (variant: DemoSessionVariant) => {
@@ -221,6 +254,45 @@ export function setupMocks() {
         updated_at: new Date().toISOString(),
       };
       return jsonResponse({ ...demoShutterName(id, entry.default), status: 'saved' });
+    }
+
+    const layoutGet = url.match(/\/api\/portal\/(lights|shutters)\/layout/);
+    if (layoutGet && method === 'GET') {
+      if (demoLayoutAbsent()) return jsonResponse({ error: 'not_found' }, 404);
+      return jsonResponse(demoLayout(layoutGet[1] as 'lights' | 'shutters'));
+    }
+
+    const layoutPut = url.match(/\/api\/portal\/admin\/(lights|shutters)\/layout/);
+    if (layoutPut && method === 'PUT') {
+      const kind = layoutPut[1] as 'lights' | 'shutters';
+      if (!isLightTimerAdmin(demoRole())) return jsonResponse({ error: 'forbidden' }, 403);
+      if (demoNamesUnavailable()) return jsonResponse({ error: 'names_unavailable' }, 503);
+      const catalogue = kind === 'lights' ? LIGHT_IDS : SHUTTER_IDS;
+      let body: { order?: unknown; disabled?: unknown; reset?: unknown } = {};
+      try {
+        body = init?.body ? JSON.parse(String(init.body)) : {};
+      } catch {
+        return jsonResponse({ error: 'invalid_layout' }, 400);
+      }
+      const current = demoLayout(kind);
+      let order: string[] = [];
+      let disabled: string[] = [];
+      if (body.reset !== true) {
+        const isList = (v: unknown): v is string[] => Array.isArray(v) && v.every((x) => typeof x === 'string');
+        if (!isList(body.order) || !isList(body.disabled)) return jsonResponse({ error: 'invalid_layout' }, 400);
+        if (new Set(body.order).size !== body.order.length || new Set(body.disabled).size !== body.disabled.length) {
+          return jsonResponse({ error: 'invalid_layout' }, 400);
+        }
+        if ([...body.order, ...body.disabled].some((id) => !catalogue.includes(id))) {
+          return jsonResponse({ error: kind === 'lights' ? 'unknown_light' : 'unknown_shutter' }, 400);
+        }
+        order = body.order;
+        disabled = body.disabled;
+      }
+      // Aucune armoire : la disposition simulée est gardée en mémoire, rien n'est envoyé.
+      const saved: DemoLayout = { order, disabled, version: current.version + 1, updated_at: new Date().toISOString() };
+      demoLayouts[kind] = saved;
+      return jsonResponse({ ...saved, status: 'saved' });
     }
 
     if (url.includes('/api/portal/inject') && method === 'POST') {
