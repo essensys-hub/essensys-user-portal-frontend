@@ -10,6 +10,7 @@ import { isTestModeEnabled, testModeHeaders, withTestModeQuery } from '../testMo
 import { parseInjectionResult } from '../injectionResult';
 import { isValidMinutes, parseLightTimers, type LightTimer } from '../lights/lightTimers';
 import { lightNameErrorMessage, parseLightNames, type LightNameMap } from '../lights/lightNames';
+import { parseShutterNames, shutterNameErrorMessage, type ShutterNameMap } from '../shutters/shutterNames';
 import { portalFetch } from '../api/portalApi';
 
 export interface InjectionBatchResult {
@@ -291,6 +292,32 @@ export const setLightName = async (id: string, name: string | null): Promise<'sa
   if (!response.ok) {
     const data: { error?: string } | null = await response.json().catch(() => null);
     throw new Error(lightNameErrorMessage(response.status, data?.error));
+  }
+  const data: { status?: string } | null = await response.json().catch(() => null);
+  return data?.status === 'dry_run' ? 'dry_run' : 'saved';
+};
+
+/** Noms personnalisés des volets (noms-volets-2026-11-005) : GET /api/portal/shutters/names. */
+export const getShutterNames = async (): Promise<ShutterNameMap> => {
+  const response = await portalFetch('/shutters/names');
+  if (!response.ok) {
+    throw new Error(`Lecture des noms impossible (${response.status})`);
+  }
+  return parseShutterNames(await response.json().catch(() => null));
+};
+
+/**
+ * Renomme un volet : PUT /api/portal/admin/shutters/names/{id}, corps {"name": "..."} ou
+ * {"name": null} (nom d'origine). Réservé à l'administrateur de l'armoire. N'écrit jamais dans l'armoire.
+ */
+export const setShutterName = async (id: string, name: string | null): Promise<'saved' | 'dry_run'> => {
+  const response = await portalFetch(`/admin/shutters/names/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ name }),
+  });
+  if (!response.ok) {
+    const data: { error?: string } | null = await response.json().catch(() => null);
+    throw new Error(shutterNameErrorMessage(response.status, data?.error));
   }
   const data: { status?: string } | null = await response.json().catch(() => null);
   return data?.status === 'dry_run' ? 'dry_run' : 'saved';

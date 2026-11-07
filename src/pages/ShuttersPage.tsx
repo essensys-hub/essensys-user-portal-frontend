@@ -2,6 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { ViewColumnsIcon } from '@heroicons/react/24/outline';
 import { PageHeader, ControlCard, ActionButton } from '../components/UI';
 import { sendInjection, getExchangeValues } from '../services/legacyApi';
+import { usePortalSession } from '../context/PortalSessionContext';
+import { isLightTimerAdmin } from '../lights/lightTimers';
+import { ShutterNameEditor } from '../components/Shutters/ShutterNameEditor';
+import { useShutterNames } from '../shutters/useShutterNames';
 
 interface Shutter {
   id: string;
@@ -40,6 +44,11 @@ const stores: Shutter[] = [
 const allShutters = [...shutters, ...stores];
 
 export const ShuttersPage: React.FC = () => {
+  const { session } = usePortalSession();
+  // Renommer : administrateur de l'armoire (le masquage est une commodité, le serveur reste la protection).
+  const namesAdmin = isLightTimerAdmin(session?.user?.role);
+  const { names, displayName, rename } = useShutterNames();
+  const [openName, setOpenName] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -67,7 +76,7 @@ export const ShuttersPage: React.FC = () => {
     const seconds = parseInt(raw, 10);
     if (isNaN(seconds) || seconds < 1 || seconds > 255) {
       setSuccess(null);
-      console.error(`[TEMPS VOLETS] Valeur invalide pour ${shutter.name}: ${raw} (1-255 attendu)`);
+      console.error(`[TEMPS VOLETS] Valeur invalide pour ${displayName(shutter.id)}: ${raw} (1-255 attendu)`);
       return;
     }
 
@@ -81,7 +90,7 @@ export const ShuttersPage: React.FC = () => {
         delete next[shutter.timeIndex];
         return next;
       });
-      setSuccess(`${shutter.name} : temps de course réglé à ${seconds} s`);
+      setSuccess(`${displayName(shutter.id)} : temps de course réglé à ${seconds} s`);
     } catch (e) {
       console.error(e);
     } finally {
@@ -97,7 +106,7 @@ export const ShuttersPage: React.FC = () => {
     try {
       const index = action === 'open' ? shutter.openIndex : shutter.closeIndex;
       await sendInjection(index, shutter.dvalue);
-      setSuccess(`${shutter.name} : ${action === 'open' ? 'Ouvert' : 'Fermé'}`);
+      setSuccess(`${displayName(shutter.id)} : ${action === 'open' ? 'Ouvert' : 'Fermé'}`);
     } catch (e) {
       console.error(e);
     } finally {
@@ -146,32 +155,67 @@ export const ShuttersPage: React.FC = () => {
 
       {/* Individual Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-          >
-            <span className="text-sm font-medium text-gray-700">{item.name}</span>
-            <div className="flex gap-2">
-              <ActionButton
-                label="Ouvrir"
-                variant="primary"
-                onClick={() => handleShutterAction(item, 'open')}
-                loading={loading === `${item.id}-open`}
-                disabled={loading !== null}
-                size="sm"
-              />
-              <ActionButton
-                label="Fermer"
-                variant="secondary"
-                onClick={() => handleShutterAction(item, 'close')}
-                loading={loading === `${item.id}-close`}
-                disabled={loading !== null}
-                size="sm"
-              />
+        {items.map((item) => {
+          const nameOpen = namesAdmin && openName === item.id;
+          const shownName = displayName(item.id);
+          return (
+            <div
+              key={item.id}
+              data-testid={`shutter-${item.id}`}
+              className={`p-3 bg-gray-50 rounded-lg ${nameOpen ? 'sm:col-span-2' : ''}`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  data-testid={`shutter-name-label-${item.id}`}
+                  className="min-w-0 break-words text-sm font-medium text-gray-700"
+                >
+                  {shownName}
+                </span>
+                <div className="flex gap-2 shrink-0">
+                  <ActionButton
+                    label="Ouvrir"
+                    variant="primary"
+                    onClick={() => handleShutterAction(item, 'open')}
+                    loading={loading === `${item.id}-open`}
+                    disabled={loading !== null}
+                    size="sm"
+                  />
+                  <ActionButton
+                    label="Fermer"
+                    variant="secondary"
+                    onClick={() => handleShutterAction(item, 'close')}
+                    loading={loading === `${item.id}-close`}
+                    disabled={loading !== null}
+                    size="sm"
+                  />
+                </div>
+              </div>
+              {namesAdmin && (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    data-testid={`shutter-name-toggle-${item.id}`}
+                    aria-expanded={nameOpen}
+                    onClick={() => setOpenName(nameOpen ? null : item.id)}
+                    className="text-sm text-essensys-primary font-medium hover:underline"
+                  >
+                    {nameOpen ? 'Masquer le nom' : 'Renommer'}
+                  </button>
+                  {nameOpen && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <ShutterNameEditor
+                        id={item.id}
+                        current={shownName}
+                        customized={names[item.id] !== undefined}
+                        save={(name) => rename(item.id, name)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
@@ -193,7 +237,12 @@ export const ShuttersPage: React.FC = () => {
               className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-2"
             >
               <div className="min-w-0">
-                <span className="block text-sm font-medium text-gray-700 truncate">{item.name}</span>
+                <span
+                  data-testid={`shutter-time-name-${item.id}`}
+                  className="block text-sm font-medium text-gray-700 break-words"
+                >
+                  {displayName(item.id)}
+                </span>
                 <span className="block text-xs text-gray-400">
                   {timesLoaded
                     ? known !== undefined
