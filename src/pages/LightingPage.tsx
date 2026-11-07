@@ -11,6 +11,9 @@ import { formatMinutes, hasLightTimer, isLightTimerAdmin } from '../lights/light
 import { useLightTimers } from '../lights/useLightTimers';
 import { LightNameEditor } from '../components/Lighting/LightNameEditor';
 import { useLightNames } from '../lights/useLightNames';
+import { useLightLayout } from '../lights/useLightLayout';
+import { LIGHT_IDS, lightGroupOf } from '../lights/lightLayout';
+import { ObjectLayoutManager } from '../components/Layout/ObjectLayoutManager';
 
 interface Light {
   id: string;
@@ -74,6 +77,8 @@ export const LightingPage: React.FC = () => {
   const [openTimer, setOpenTimer] = useState<string | null>(null);
   const [openName, setOpenName] = useState<string | null>(null);
   const { names, displayName, rename } = useLightNames();
+  const { layout, effective, save: saveLayout } = useLightLayout();
+  const [manageOpen, setManageOpen] = useState(false);
 
   const handleLightAction = async (light: Light, action: 'on' | 'off') => {
     const loadingKey = `${light.id}-${action}`;
@@ -126,7 +131,12 @@ export const LightingPage: React.FC = () => {
     }
   };
 
-  const renderLightControls = (lights: Light[], groupName: string) => (
+  const renderLightControls = (lights: Light[], groupName: string) =>
+    lights.length === 0 ? (
+      <p data-testid={`lights-empty-${groupName}`} className="text-sm text-gray-500">
+        Aucune lumière activée
+      </p>
+    ) : (
     <div className="space-y-4">
       {/* Group Actions */}
       <div className="flex gap-2 pb-4 border-b border-gray-100">
@@ -161,11 +171,14 @@ export const LightingPage: React.FC = () => {
               data-testid={`light-${light.id}`}
               className={`p-3 bg-gray-50 rounded-lg ${timerOpen || nameOpen ? 'sm:col-span-2' : ''}`}
             >
-              <div className="flex items-center justify-between">
-                <span data-testid={`light-name-label-${light.id}`} className="text-sm font-medium text-gray-700">
+              <div className="flex items-center justify-between gap-2">
+                <span
+                  data-testid={`light-name-label-${light.id}`}
+                  className="min-w-0 [overflow-wrap:anywhere] text-sm font-medium text-gray-700"
+                >
                   {shownName}
                 </span>
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <ActionButton
                     label="Allumer"
                     variant="primary"
@@ -239,7 +252,7 @@ export const LightingPage: React.FC = () => {
         })}
       </div>
     </div>
-  );
+    );
 
   return (
     <div>
@@ -283,13 +296,38 @@ export const LightingPage: React.FC = () => {
         </div>
       )}
 
+      {timersAdmin && (
+        <div className="mb-4">
+          <button
+            type="button"
+            data-testid="layout-toggle-lights"
+            aria-expanded={manageOpen}
+            onClick={() => setManageOpen(!manageOpen)}
+            className="text-sm text-essensys-primary font-medium hover:underline"
+          >
+            {manageOpen ? "Masquer la gestion de l'affichage" : "Gérer l'affichage"}
+          </button>
+        </div>
+      )}
+      {timersAdmin && manageOpen && (
+        <ObjectLayoutManager
+          kind="lights"
+          ids={LIGHT_IDS}
+          groupOf={lightGroupOf}
+          displayName={displayName}
+          layout={layout}
+          save={saveLayout}
+          onClose={() => setManageOpen(false)}
+        />
+      )}
+
       <div className="space-y-6">
         <ControlCard title="Éclairages principaux" description="Lumières principales de la maison">
-          {renderLightControls(mainLights, 'Principaux')}
+          {renderLightControls(effective.apply(mainLights), 'Principaux')}
         </ControlCard>
 
         <ControlCard title="Éclairages indirects" description="Lumières d'ambiance">
-          {renderLightControls(indirectLights, 'Indirects')}
+          {renderLightControls(effective.apply(indirectLights), 'Indirects')}
         </ControlCard>
       </div>
     </div>

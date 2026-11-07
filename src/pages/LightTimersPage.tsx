@@ -8,6 +8,7 @@ import { isArmoireOnline } from '../api/portalApi';
 import { LIGHT_TIMER_CATALOG, isLightTimerAdmin } from '../lights/lightTimers';
 import { useLightTimers } from '../lights/useLightTimers';
 import { useLightNames } from '../lights/useLightNames';
+import { useLightLayout } from '../lights/useLightLayout';
 
 export const LightTimersPage: React.FC = () => {
   const { session } = usePortalSession();
@@ -16,6 +17,7 @@ export const LightTimersPage: React.FC = () => {
   const online = isArmoireOnline(session);
   const { timers, error, readValue, writeValue } = useLightTimers(admin);
   const { displayName } = useLightNames();
+  const { effective } = useLightLayout();
 
   return (
     <div>
@@ -44,7 +46,10 @@ export const LightTimersPage: React.FC = () => {
             </div>
           )}
           <ul className="space-y-6" data-testid="light-timers-list">
-            {LIGHT_TIMER_CATALOG.map((entry) => {
+            {(effective.reordered
+              ? effective.apply(LIGHT_TIMER_CATALOG)
+              : LIGHT_TIMER_CATALOG.filter((e) => effective.isActive(e.id))
+            ).map((entry) => {
               const timer = timers?.find((t) => t.id === entry.id);
               return (
                 <li key={entry.id} data-testid={`light-timers-row-${entry.id}`}>

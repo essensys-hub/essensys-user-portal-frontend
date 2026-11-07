@@ -1,0 +1,121 @@
+{
+  "$schema": "./schema/feature.schema.json",
+  "status": "proposed",
+  "owner": "nrineau",
+  "github": {
+    "issue": "essensys-hub/essensys-feature-lifecycle#55",
+    "project_item": null
+  },
+  "git": {
+    "branch": "feat/affichage-objets-2026-11-006",
+    "pr_url": null
+  },
+  "openspec": {
+    "change_id": "affichage-objets-2026-11-006",
+    "path": "openspec/changes/affichage-objets-2026-11-006",
+    "proposal": "openspec/changes/affichage-objets-2026-11-006/proposal.md",
+    "design": null,
+    "tasks": "openspec/changes/affichage-objets-2026-11-006/tasks.md",
+    "specs": [
+      "openspec/changes/affichage-objets-2026-11-006/specs/object-layout-clients/spec.md"
+    ]
+  },
+  "security": {
+    "sca_tool": "dependabot",
+    "dependabot_alerts_url": null,
+    "last_scan_at": null,
+    "cve_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "secret_scan": {
+      "status": "clean",
+      "tool": "gitleaks",
+      "last_scan_at": null
+    },
+    "muted_findings": [],
+    "threat_model_url": "../essensys-memory/openspec/changes/portal-user-guide-2026-10-006/design.md",
+    "owner_security": "nrineau"
+  },
+  "id": "affichage-objets-2026-11-006",
+  "title": "Activer, désactiver et ordonner les lumières et les volets depuis les apps et les portails",
+  "implementation": {
+    "paths": [
+      "src/layout/objectLayout.ts",
+      "src/layout/useObjectLayout.ts",
+      "src/lights/lightLayout.ts",
+      "src/lights/useLightLayout.ts",
+      "src/shutters/shutterLayout.ts",
+      "src/shutters/useShutterLayout.ts",
+      "src/components/Layout/ObjectLayoutManager.tsx",
+      "src/pages/LightingPage.tsx",
+      "src/pages/ShuttersPage.tsx",
+      "src/pages/LightTimersPage.tsx",
+      "src/services/legacyApi.ts",
+      "src/mockFetch.ts"
+    ],
+    "primary_surface": "react-user"
+  },
+  "userguide": {
+    "pages": [
+      "docs/user-guide/eclairage.md",
+      "docs/user-guide/volets.md"
+    ],
+    "language": "fr",
+    "i18n_keys": [],
+    "screenshots": [
+      "docs/user-guide/images/eclairage-desktop.png",
+      "docs/user-guide/images/volets-desktop.png"
+    ]
+  },
+  "tests": {
+    "playwright": [
+      "e2e/tests/object-layout.spec.ts",
+      "e2e/tests/object-layout-logic.spec.ts"
+    ],
+    "coverage_must_test": [
+      "lumiere desactivee : absente de la liste, de Tout allumer et de Temporisations",
+      "volet desactive : absent de la liste, de Tout ouvrir et de Temps de course",
+      "groupe vide : texte, aucun bouton de groupe",
+      "ordre choisi applique a la liste et a Temps de course",
+      "ancien cloud (404) : catalogue complet",
+      "administrateur : desactiver, reactiver, monter et ordre d origine",
+      "erreur 503 : message clair, ecran ouvert",
+      "non-administrateur : ni bouton de gestion ni objets desactives",
+      "noms inchanges, nom de 40 caracteres lisible"
+    ],
+    "smoke_tags": [
+      "@nr",
+      "@docs"
+    ],
+    "ux_matrix": {
+      "required": true,
+      "devices": [
+        "desktop",
+        "iphone",
+        "ipad"
+      ],
+      "targets": [
+        "demo"
+      ],
+      "required_projects": [
+        "portal-desktop",
+        "portal-iphone",
+        "portal-ipad"
+      ],
+      "screenshots_required": true,
+      "visual_regression_required": true,
+      "no_armoire_required": true
+    }
+  },
+  "release": {
+    "changelog_entry": "Portail cloud : l'administrateur de l'armoire peut masquer et ordonner les lumières et les volets (#45).",
+    "target_tag": null,
+    "surfaces": [
+      "essensys-user-portal-frontend"
+    ],
+    "paths": []
+  }
+}

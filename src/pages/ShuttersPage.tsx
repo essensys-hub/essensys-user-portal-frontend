@@ -6,6 +6,9 @@ import { usePortalSession } from '../context/PortalSessionContext';
 import { isLightTimerAdmin } from '../lights/lightTimers';
 import { ShutterNameEditor } from '../components/Shutters/ShutterNameEditor';
 import { useShutterNames } from '../shutters/useShutterNames';
+import { useShutterLayout } from '../shutters/useShutterLayout';
+import { SHUTTER_IDS, shutterGroupOf } from '../shutters/shutterLayout';
+import { ObjectLayoutManager } from '../components/Layout/ObjectLayoutManager';
 
 interface Shutter {
   id: string;
@@ -41,13 +44,17 @@ const stores: Shutter[] = [
   { id: 'store', name: 'Store (banne)', dvalue: '8', openIndex: 619, closeIndex: 622, timeIndex: 585 },
 ];
 
-const allShutters = [...shutters, ...stores];
-
 export const ShuttersPage: React.FC = () => {
   const { session } = usePortalSession();
   // Renommer : administrateur de l'armoire (le masquage est une commodité, le serveur reste la protection).
   const namesAdmin = isLightTimerAdmin(session?.user?.role);
   const { names, displayName, rename } = useShutterNames();
+  const { layout, effective, save: saveLayout } = useShutterLayout();
+  const [manageOpen, setManageOpen] = useState(false);
+  // Volets actifs, dans l'ordre choisi : listes, groupes et « Temps de course » partagent ces listes.
+  const activeShutters = effective.apply(shutters);
+  const activeStores = effective.apply(stores);
+  const allShutters = effective.apply([...shutters, ...stores]);
   const [openName, setOpenName] = useState<string | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -57,10 +64,17 @@ export const ShuttersPage: React.FC = () => {
   const [editedTimes, setEditedTimes] = useState<Record<number, string>>({});
   const [timesLoaded, setTimesLoaded] = useState(false);
 
+  // Lecture des temps de course limitée aux volets actifs (clé stable pour ne relire qu'au changement).
+  const timeIndexKey = allShutters.map((s) => s.timeIndex).join(',');
   useEffect(() => {
+    const timeIndexes = timeIndexKey === '' ? [] : timeIndexKey.split(',').map(Number);
+    if (timeIndexes.length === 0) {
+      setTimesLoaded(true);
+      return;
+    }
     const loadTimes = async () => {
       try {
-        const values = await getExchangeValues(allShutters.map((s) => s.timeIndex));
+        const values = await getExchangeValues(timeIndexes);
         setKnownTimes(values);
       } catch (e) {
         console.error('[TEMPS VOLETS] Lecture impossible:', e);
@@ -69,7 +83,7 @@ export const ShuttersPage: React.FC = () => {
       }
     };
     loadTimes();
-  }, []);
+  }, [timeIndexKey]);
 
   const handleSaveTime = async (shutter: Shutter) => {
     const raw = editedTimes[shutter.timeIndex];
@@ -131,7 +145,12 @@ export const ShuttersPage: React.FC = () => {
     }
   };
 
-  const renderShutterControls = (items: Shutter[], groupName: string) => (
+  const renderShutterControls = (items: Shutter[], groupName: string) =>
+    items.length === 0 ? (
+      <p data-testid={`shutters-empty-${groupName}`} className="text-sm text-gray-500">
+        Aucun volet activé
+      </p>
+    ) : (
     <div className="space-y-4">
       {/* Group Actions */}
       <div className="flex gap-2 pb-4 border-b border-gray-100">
@@ -218,9 +237,14 @@ export const ShuttersPage: React.FC = () => {
         })}
       </div>
     </div>
-  );
+    );
 
-  const renderTimeSettings = () => (
+  const renderTimeSettings = () =>
+    allShutters.length === 0 ? (
+      <p data-testid="shutters-empty-times" className="text-sm text-gray-500">
+        Aucun volet activé
+      </p>
+    ) : (
     <div className="space-y-3">
       <p className="text-xs text-gray-500">
         Durée de maintien de la commande du moteur, identique à l'ouverture et à la fermeture
@@ -277,7 +301,7 @@ export const ShuttersPage: React.FC = () => {
         })}
       </div>
     </div>
-  );
+    );
 
   return (
     <div>
@@ -298,13 +322,38 @@ export const ShuttersPage: React.FC = () => {
         </div>
       )}
 
+      {namesAdmin && (
+        <div className="mb-4">
+          <button
+            type="button"
+            data-testid="layout-toggle-shutters"
+            aria-expanded={manageOpen}
+            onClick={() => setManageOpen(!manageOpen)}
+            className="text-sm text-essensys-primary font-medium hover:underline"
+          >
+            {manageOpen ? "Masquer la gestion de l'affichage" : "Gérer l'affichage"}
+          </button>
+        </div>
+      )}
+      {namesAdmin && manageOpen && (
+        <ObjectLayoutManager
+          kind="shutters"
+          ids={SHUTTER_IDS}
+          groupOf={shutterGroupOf}
+          displayName={displayName}
+          layout={layout}
+          save={saveLayout}
+          onClose={() => setManageOpen(false)}
+        />
+      )}
+
       <div className="space-y-6">
         <ControlCard title="Volets" description="Volets roulants">
-          {renderShutterControls(shutters, 'Volets')}
+          {renderShutterControls(activeShutters, 'Volets')}
         </ControlCard>
 
         <ControlCard title="Volet Store et Store banne" description="Éléments spéciaux">
-          {renderShutterControls(stores, 'Stores')}
+          {renderShutterControls(activeStores, 'Stores')}
         </ControlCard>
 
         <ControlCard
