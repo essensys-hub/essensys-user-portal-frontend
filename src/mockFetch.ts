@@ -1,6 +1,7 @@
 import { handleMockScenarioRequest } from './mockScenarios';
 import { LIGHT_TIMER_CATALOG, isLightTimerAdmin, isValidMinutes } from './lights/lightTimers';
 import { LIGHT_NAME_CATALOG, validateLightName } from './lights/lightNames';
+import { SHUTTER_NAME_CATALOG, validateShutterName } from './shutters/shutterNames';
 
 const originalFetch = window.fetch;
 
@@ -54,6 +55,8 @@ const demoLightTimers: Record<string, number | null> = {
  */
 const demoLightNames: Record<string, { name: string | null; version: number; updated_at: string | null }> = {};
 
+const demoShutterNames: Record<string, { name: string | null; version: number; updated_at: string | null }> = {};
+
 const demoNamesUnavailable = (): boolean => {
   try {
     return sessionStorage.getItem('essensys_demo_names') === 'unavailable';
@@ -64,6 +67,19 @@ const demoNamesUnavailable = (): boolean => {
 
 const demoLightName = (id: string, def: string) => {
   const row = demoLightNames[id];
+  return { id, default: def, name: row?.name ?? null, version: row?.version ?? 0, updated_at: row?.updated_at ?? null };
+};
+
+const demoInjectLive = (): boolean => {
+  try {
+    return sessionStorage.getItem('essensys_demo_inject') === 'live';
+  } catch {
+    return false;
+  }
+};
+
+const demoShutterName = (id: string, def: string) => {
+  const row = demoShutterNames[id];
   return { id, default: def, name: row?.name ?? null, version: row?.version ?? 0, updated_at: row?.updated_at ?? null };
 };
 
@@ -180,9 +196,39 @@ export function setupMocks() {
       return jsonResponse({ ...demoLightName(id, entry.default), status: 'saved' });
     }
 
+    if (url.includes('/api/portal/shutters/names') && method === 'GET') {
+      return jsonResponse({ shutters: SHUTTER_NAME_CATALOG.map((e) => demoShutterName(e.id, e.default)) });
+    }
+
+    const shutterNamePut = url.match(/\/api\/portal\/admin\/shutters\/names\/([^/?]+)/);
+    if (shutterNamePut && method === 'PUT') {
+      if (!isLightTimerAdmin(demoRole())) return jsonResponse({ error: 'forbidden' }, 403);
+      if (demoNamesUnavailable()) return jsonResponse({ error: 'names_unavailable' }, 503);
+      const id = decodeURIComponent(shutterNamePut[1]);
+      const entry = SHUTTER_NAME_CATALOG.find((e) => e.id === id);
+      if (!entry) return jsonResponse({ error: 'unknown_shutter' }, 400);
+      const raw = (init?.body ? JSON.parse(String(init.body)) : {}).name;
+      let name: string | null = null;
+      if (raw !== null && raw !== undefined) {
+        const checked = typeof raw === 'string' ? validateShutterName(raw) : null;
+        if (!checked || !checked.ok) return jsonResponse({ error: 'invalid_name' }, 400);
+        name = checked.name;
+      }
+      // Aucune armoire : le nom simulé est gardé en mémoire, rien n'est envoyé.
+      demoShutterNames[id] = {
+        name,
+        version: (demoShutterNames[id]?.version ?? 0) + 1,
+        updated_at: new Date().toISOString(),
+      };
+      return jsonResponse({ ...demoShutterName(id, entry.default), status: 'saved' });
+    }
+
     if (url.includes('/api/portal/inject') && method === 'POST') {
       const isDryRun = url.includes('test_mode=dry_run');
       const body = init?.body ? JSON.parse(String(init.body)) : {};
+      // Démonstration : `sessionStorage['essensys_demo_inject'] = 'live'` simule une commande acceptée
+      // (aucune armoire, rien n'est envoyé) pour vérifier les messages de dernière action.
+      if (!isDryRun && demoInjectLive()) return jsonResponse({ status: 'ok', guid: 'demo-guid' });
       if (isDryRun || import.meta.env.VITE_DEMO_MODE === 'true') {
         return jsonResponse({
           status: 'test_ok',
