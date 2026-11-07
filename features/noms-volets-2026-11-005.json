@@ -1,0 +1,110 @@
+{
+  "$schema": "./schema/feature.schema.json",
+  "status": "proposed",
+  "owner": "nrineau",
+  "github": {
+    "issue": "essensys-hub/essensys-feature-lifecycle#52",
+    "project_item": null
+  },
+  "git": {
+    "branch": "feat/noms-volets-2026-11-005",
+    "pr_url": null
+  },
+  "openspec": {
+    "change_id": "noms-volets-2026-11-005",
+    "path": "openspec/changes/noms-volets-2026-11-005",
+    "proposal": "openspec/changes/noms-volets-2026-11-005/proposal.md",
+    "design": null,
+    "tasks": "openspec/changes/noms-volets-2026-11-005/tasks.md",
+    "specs": [
+      "openspec/changes/noms-volets-2026-11-005/specs/shutter-names-clients/spec.md"
+    ]
+  },
+  "security": {
+    "sca_tool": "dependabot",
+    "dependabot_alerts_url": null,
+    "last_scan_at": null,
+    "cve_findings": {
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "secret_scan": {
+      "status": "clean",
+      "tool": "gitleaks",
+      "last_scan_at": null
+    },
+    "muted_findings": [],
+    "threat_model_url": "../essensys-memory/openspec/changes/portal-user-guide-2026-10-006/design.md",
+    "owner_security": "nrineau"
+  },
+  "id": "noms-volets-2026-11-005",
+  "title": "Personnaliser le nom des volets et stores depuis les apps et les portails",
+  "implementation": {
+    "paths": [
+      "src/shutters/shutterNames.ts",
+      "src/shutters/useShutterNames.ts",
+      "src/components/Shutters/ShutterNameEditor.tsx",
+      "src/pages/ShuttersPage.tsx",
+      "src/services/legacyApi.ts",
+      "src/mockFetch.ts"
+    ],
+    "primary_surface": "react-user"
+  },
+  "userguide": {
+    "pages": [
+      "docs/user-guide/volets.md"
+    ],
+    "language": "fr",
+    "i18n_keys": [],
+    "screenshots": [
+      "docs/user-guide/images/volets-desktop.png"
+    ]
+  },
+  "tests": {
+    "playwright": [
+      "e2e/tests/shutter-names.spec.ts",
+      "e2e/tests/shutter-names-logic.spec.ts"
+    ],
+    "coverage_must_test": [
+      "Volet 1 Salon renomme Volet baie vitree : liste, Temps de course et message, puis remise a zero",
+      "41 caracteres refuse sans requete",
+      "non-administrateur : aucun champ de nom",
+      "lecture impossible : noms d origine",
+      "chevrons refuses avant envoi",
+      "Store \"nord\" affiche tel quel"
+    ],
+    "smoke_tags": [
+      "@nr",
+      "@docs"
+    ],
+    "ux_matrix": {
+      "required": true,
+      "devices": [
+        "desktop",
+        "iphone",
+        "ipad"
+      ],
+      "targets": [
+        "demo"
+      ],
+      "required_projects": [
+        "portal-desktop",
+        "portal-iphone",
+        "portal-ipad"
+      ],
+      "screenshots_required": true,
+      "visual_regression_required": true,
+      "no_armoire_required": true
+    }
+  },
+  "release": {
+    "changelog_entry": "Portail cloud : nom personnalisé des volets et stores, modifiable par l'administrateur de l'armoire (#43).",
+    "target_tag": null,
+    "surfaces": [
+      "essensys-user-portal-frontend"
+    ],
+    "paths": []
+  }
+}
