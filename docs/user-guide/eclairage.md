@@ -18,6 +18,8 @@ Menu **Éclairage** (ordinateur), **Lumières** en bas de l'écran (téléphone)
 4. **Le nom de la pièce** (Terrasse, Entrée, Salon…), tel qu'il est configuré dans votre armoire.
 5. **Allumer** / **Éteindre** : commande la lumière de cette pièce.
 
+Si vous êtes **administrateur de l'armoire**, les lumières du Dressing, des WC 1 et 2, du Service et des Annexes 1 et 2 proposent en plus le lien **Temporisation** : il déplie le réglage de leur extinction automatique (voir **[Temporisations](temporisations.md)**).
+
 Après chaque appui, le portail confirme l'envoi. L'armoire exécute la commande en **quelques secondes**. N'appuyez pas plusieurs fois de suite : la commande est déjà partie.
 
 ![L'écran Éclairage sur téléphone](images/eclairage-mobile.png)

@@ -8,6 +8,7 @@ import type { InjectionProgressEvent } from '../heating/injectionProgress';
 import type { ScheduleSyncEvent } from '../heating/scheduleSync';
 import { isTestModeEnabled, testModeHeaders, withTestModeQuery } from '../testMode';
 import { parseInjectionResult } from '../injectionResult';
+import { isValidMinutes, parseLightTimers, type LightTimer } from '../lights/lightTimers';
 
 export interface InjectionBatchResult {
   totalParams: number;
@@ -221,4 +222,48 @@ export const sendAlarmAction = async (alarmState: string, code: string): Promise
   if (!response.ok) {
     throw new Error(await response.text().catch(() => 'alarm action failed'));
   }
+};
+
+/** Temporisations des six lumières (lumieres-temporisees-2026-11-003) : GET /api/portal/lights/timers. */
+export const getLightTimers = async (): Promise<LightTimer[]> => {
+  const response = await fetch('/api/portal/lights/timers', { headers: portalHeaders() });
+  handleAuthError(response);
+  if (!response.ok) {
+    throw new Error(`Lecture des temporisations impossible (${response.status})`);
+  }
+  return parseLightTimers(await response.json().catch(() => null));
+};
+
+/**
+ * Règle la temporisation d'une lumière : PUT /api/portal/admin/lights/timers/{id}, corps {"minutes": n}.
+ * Réservé à l'administrateur de l'armoire (403 sinon). En mode test, le serveur répond `dry_run`.
+ */
+export const setLightTimer = async (id: string, minutes: number): Promise<'queued' | 'dry_run'> => {
+  if (!isValidMinutes(minutes)) {
+    throw new Error('Durée invalide : entier de 0 à 255 minutes.');
+  }
+  const response = await fetch(injectUrl(`/admin/lights/timers/${encodeURIComponent(id)}`), {
+    method: 'PUT',
+    headers: portalHeaders(),
+    body: JSON.stringify({ minutes }),
+  });
+  handleAuthError(response);
+  if (response.status === 403) {
+    throw new Error("Réglage réservé à l'administrateur de l'armoire.");
+  }
+  if (!response.ok) {
+    throw new Error(
+      response.status === 400 ? 'Valeur refusée par le serveur.' : `Envoi impossible (${response.status})`,
+    );
+  }
+  const data: { status?: string } | null = await response.json().catch(() => null);
+  if (data?.status === 'dry_run') {
+    if (!isTestModeEnabled()) {
+      throw new Error(
+        'Commande bloquée en dry-run alors que le mode test est désactivé — vérifiez Paramètres.',
+      );
+    }
+    return 'dry_run';
+  }
+  return 'queued';
 };

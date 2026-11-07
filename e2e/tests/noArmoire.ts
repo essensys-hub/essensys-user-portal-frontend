@@ -12,6 +12,9 @@ declare global {
   }
 }
 
+/** Rôle de la session simulée (`essensys_demo_role` dans src/mockFetch.ts) ; défaut admin_local. */
+export type DemoRole = 'admin_local' | 'admin_global' | 'user';
+
 /** Variantes de la session simulée (voir `DemoSessionVariant` dans src/mockFetch.ts). */
 export type SessionVariant =
   | 'gateway-online'
@@ -29,7 +32,7 @@ export type SessionVariant =
  */
 export async function noArmoire(
   page: Page,
-  opts: { session?: SessionVariant; withoutState?: boolean } = {},
+  opts: { session?: SessionVariant; withoutState?: boolean; role?: DemoRole } = {},
 ): Promise<string[]> {
   const external: string[] = [];
   await page.route('**/*', (route) => {
@@ -43,6 +46,9 @@ export async function noArmoire(
   await page.addInitScript((variant: string) => {
     sessionStorage.setItem('essensys_demo_session', variant);
   }, opts.session ?? 'gateway-online');
+  await page.addInitScript((role: string) => {
+    sessionStorage.setItem('essensys_demo_role', role);
+  }, opts.role ?? 'admin_local');
   await page.addInitScript(({ withoutState }: { withoutState: boolean }) => {
     const native = window.fetch.bind(window);
     const passthrough = new WeakSet<object>();

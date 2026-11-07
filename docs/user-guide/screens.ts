@@ -53,6 +53,18 @@ export const screens: Screen[] = [
     ],
   },
   {
+    slug: 'temporisations',
+    route: '/lighting/timers',
+    title: 'Temporisations',
+    markers: [
+      { n: 1, target: { role: 'heading', name: 'Dressing' } },
+      { n: 2, target: { text: 'Extinction automatique :' } },
+      { n: 3, target: { role: 'button', name: '15 min' } },
+      { n: 4, target: { role: 'textbox', name: 'Autre durée (minutes, 1 à 255)' } },
+      { n: 5, target: { role: 'button', name: 'Appliquer' } },
+    ],
+  },
+  {
     slug: 'volets',
     route: '/shutters',
     title: 'Volets et stores',

@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { XMarkIcon } from '@heroicons/react/24/outline';
-import { navItems, adminNavItems } from './SidebarMenu';
+import { navItems, visibleAdminNavItems } from './SidebarMenu';
 import { LogoutButton } from './LogoutButton';
 import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
 
@@ -82,7 +82,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
         )}
 
         {/* Navigation */}
-        <nav className="px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
+        <nav className="px-3 pt-4 pb-40 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
           {navItems.map((item) => (
             <NavLink
               key={item.to}
@@ -105,7 +105,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({ isOpen, onClose }) =
             <p className="px-3 mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
               Administration
             </p>
-            {adminNavItems.map((item) => (
+            {visibleAdminNavItems(session?.user?.role).map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}

@@ -4,6 +4,11 @@ import { PageHeader, ControlCard, ActionButton } from '../components/UI';
 import { sendInjection } from '../services/legacyApi';
 import { useTestMode } from '../context/TestModeContext';
 import { useLastAction } from '../hooks';
+import { usePortalSession } from '../context/PortalSessionContext';
+import { isArmoireOnline } from '../api/portalApi';
+import { LightTimerControl } from '../components/Lighting/LightTimerControl';
+import { formatMinutes, hasLightTimer, isLightTimerAdmin } from '../lights/lightTimers';
+import { useLightTimers } from '../lights/useLightTimers';
 
 interface Light {
   id: string;
@@ -60,6 +65,11 @@ export const LightingPage: React.FC = () => {
   const { enabled: testMode } = useTestMode();
   const { lastAction, polling, refetch } = useLastAction();
   const armoireBusy = lastAction != null && !lastAction.isDone;
+  const { session } = usePortalSession();
+  const timersAdmin = isLightTimerAdmin(session?.user?.role);
+  const online = isArmoireOnline(session);
+  const { timers, readValue, writeValue } = useLightTimers(timersAdmin);
+  const [openTimer, setOpenTimer] = useState<string | null>(null);
 
   const handleLightAction = async (light: Light, action: 'on' | 'off') => {
     const loadingKey = `${light.id}-${action}`;
@@ -136,32 +146,66 @@ export const LightingPage: React.FC = () => {
 
       {/* Individual Controls */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {lights.map((light) => (
-          <div
-            key={light.id}
-            className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-          >
-            <span className="text-sm font-medium text-gray-700">{light.name}</span>
-            <div className="flex gap-2">
-              <ActionButton
-                label="Allumer"
-                variant="primary"
-                onClick={() => handleLightAction(light, 'on')}
-                loading={loading === `${light.id}-on`}
-                disabled={loading !== null}
-                size="sm"
-              />
-              <ActionButton
-                label="Éteindre"
-                variant="secondary"
-                onClick={() => handleLightAction(light, 'off')}
-                loading={loading === `${light.id}-off`}
-                disabled={loading !== null}
-                size="sm"
-              />
+        {lights.map((light) => {
+          const timerOpen = timersAdmin && hasLightTimer(light.id) && openTimer === light.id;
+          const timer = timers?.find((t) => t.id === light.id);
+          return (
+            <div
+              key={light.id}
+              data-testid={`light-${light.id}`}
+              className={`p-3 bg-gray-50 rounded-lg ${timerOpen ? 'sm:col-span-2' : ''}`}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700">{light.name}</span>
+                <div className="flex gap-2">
+                  <ActionButton
+                    label="Allumer"
+                    variant="primary"
+                    onClick={() => handleLightAction(light, 'on')}
+                    loading={loading === `${light.id}-on`}
+                    disabled={loading !== null}
+                    size="sm"
+                  />
+                  <ActionButton
+                    label="Éteindre"
+                    variant="secondary"
+                    onClick={() => handleLightAction(light, 'off')}
+                    loading={loading === `${light.id}-off`}
+                    disabled={loading !== null}
+                    size="sm"
+                  />
+                </div>
+              </div>
+              {timersAdmin && hasLightTimer(light.id) && (
+                <div className="mt-2">
+                  <button
+                    type="button"
+                    data-testid={`light-timer-toggle-${light.id}`}
+                    aria-expanded={timerOpen}
+                    onClick={() => setOpenTimer(timerOpen ? null : light.id)}
+                    className="text-sm text-essensys-primary font-medium hover:underline"
+                  >
+                    {timerOpen ? 'Masquer la temporisation' : 'Temporisation'}
+                    {timer && !timerOpen ? ` · ${formatMinutes(timer.minutes)}` : ''}
+                  </button>
+                  {timerOpen && timers && (
+                    <div className="mt-3 pt-3 border-t border-gray-200">
+                      <LightTimerControl
+                        id={light.id}
+                        label={light.name}
+                        value={timer?.minutes ?? null}
+                        online={online}
+                        dryRun={testMode}
+                        readValue={() => readValue(light.id)}
+                        writeValue={(m) => writeValue(light.id, m)}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
