@@ -129,8 +129,13 @@ test.describe('affichage des lumieres et des volets', () => {
     puts = await layoutPuts(page, 'lights');
     expect(puts).toHaveLength(3);
     expect(puts[2].body).toEqual({ reset: true });
-    const after = await page.locator('[data-testid^="light-name-label-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
-    expect(after.indexOf('light-name-label-salon')).toBeLessThan(after.indexOf('light-name-label-sam'));
+    // L'ecriture est asynchrone : on attend l'ordre d'origine plutot que de le lire tout de suite.
+    await expect
+      .poll(async () => {
+        const after = await page.locator('[data-testid^="light-name-label-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
+        return after.indexOf('light-name-label-salon') < after.indexOf('light-name-label-sam');
+      })
+      .toBe(true);
 
     // Aucun ordre vers l'armoire
     expect(await injections(page)).toEqual([]);
