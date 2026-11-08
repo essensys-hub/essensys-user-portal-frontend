@@ -1,11 +1,18 @@
 import React from 'react';
 import { ServerStackIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import type { GatewayState } from '../../api/portalApi';
 import { usePortalSession, formatUserDisplayName } from '../../context/PortalSessionContext';
 
 const formatDate = (iso?: string): string => {
   if (!iso) return '—';
   const d = new Date(iso);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString('fr-FR');
+};
+
+const GATEWAY_STATE_LABEL: Record<GatewayState, string> = {
+  online: 'Gateway en ligne',
+  offline: 'Gateway hors ligne',
+  none: 'Aucune gateway liée',
 };
 
 export const PortalContextPanel: React.FC = () => {
@@ -28,7 +35,9 @@ export const PortalContextPanel: React.FC = () => {
   if (!session) return null;
 
   const displayName = formatUserDisplayName(session);
-  const { user, gateway, armoire } = session;
+  const { user, gateway, armoire, gateway_state: gatewayState } = session;
+  // Valeur inconnue ou champ absent (ancien cloud) : on retombe sur le bloc `gateway`.
+  const stateLabel = gatewayState ? GATEWAY_STATE_LABEL[gatewayState] : undefined;
 
   return (
     <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -73,7 +82,15 @@ export const PortalContextPanel: React.FC = () => {
             ) : (
               <p className="text-sm text-gray-500">Aucune armoire liée à ce compte.</p>
             )}
-            {gateway && (
+            {stateLabel ? (
+              <p
+                data-testid="gateway-state"
+                data-state={gatewayState}
+                className={`text-xs mt-2 inline-block px-2 py-0.5 rounded-full ${gatewayState === 'online' ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'}`}
+              >
+                {stateLabel}
+              </p>
+            ) : gateway && (
               <p className={`text-xs mt-2 inline-block px-2 py-0.5 rounded-full ${gateway.online ? 'bg-green-100 text-green-800' : 'bg-gray-200 text-gray-600'}`}>
                 Gateway {gateway.hostname || gateway.id} {gateway.online ? 'en ligne' : 'hors ligne'}
                 {gateway.ip ? ` · ${gateway.ip}` : ''}

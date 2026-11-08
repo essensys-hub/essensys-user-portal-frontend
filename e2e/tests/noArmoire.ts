@@ -24,6 +24,9 @@ export type SessionVariant =
   | 'no-gateway-old'
   | 'none';
 
+/** Force `gateway_state` de la session simulée ; `absent` simule un ancien cloud sans le champ. */
+export type GatewayStateOverride = 'none' | 'offline' | 'online' | 'absent';
+
 /**
  * Garde no-armoire : toute requête hors localhost est bloquée, et le fetch simulé du mode démo
  * est enveloppé pour enregistrer les écritures (POST/PUT) vers /api/portal. `session` choisit la
@@ -32,7 +35,7 @@ export type SessionVariant =
  */
 export async function noArmoire(
   page: Page,
-  opts: { session?: SessionVariant; withoutState?: boolean; role?: DemoRole } = {},
+  opts: { session?: SessionVariant; gatewayState?: GatewayStateOverride; withoutState?: boolean; role?: DemoRole } = {},
 ): Promise<string[]> {
   const external: string[] = [];
   await page.route('**/*', (route) => {
@@ -46,6 +49,11 @@ export async function noArmoire(
   await page.addInitScript((variant: string) => {
     sessionStorage.setItem('essensys_demo_session', variant);
   }, opts.session ?? 'gateway-online');
+  if (opts.gatewayState) {
+    await page.addInitScript((state: string) => {
+      sessionStorage.setItem('essensys_demo_gateway_state', state);
+    }, opts.gatewayState);
+  }
   await page.addInitScript((role: string) => {
     sessionStorage.setItem('essensys_demo_role', role);
   }, opts.role ?? 'admin_local');

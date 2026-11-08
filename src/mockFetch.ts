@@ -116,6 +116,24 @@ const demoLayout = (kind: 'lights' | 'shutters'): DemoLayout => {
   return row;
 };
 
+/**
+ * État de la gateway renvoyé par la session simulée (sonnette-plages-push-2026-11-008), forcé par
+ * `sessionStorage['essensys_demo_gateway_state']` : `none`, `offline`, `online`, ou `absent` pour
+ * simuler un ancien cloud sans le champ. Sans réglage, il découle de la variante.
+ */
+const demoGatewayState = (hasGateway: boolean, gatewayOnline: boolean): string | undefined => {
+  let forced: string | null = null;
+  try {
+    forced = sessionStorage.getItem('essensys_demo_gateway_state');
+  } catch {
+    forced = null;
+  }
+  if (forced === 'absent') return undefined;
+  if (forced === 'none' || forced === 'offline' || forced === 'online') return forced;
+  if (!hasGateway) return 'none';
+  return gatewayOnline ? 'online' : 'offline';
+};
+
 const demoSession = (variant: DemoSessionVariant) => {
   const hasGateway = variant === 'gateway-online' || variant === 'gateway-offline-armoire-seen' || variant === 'all-offline';
   const gatewayOnline = variant === 'gateway-online';
@@ -131,6 +149,7 @@ const demoSession = (variant: DemoSessionVariant) => {
       role: demoRole(),
       linked_gateway_id: hasGateway ? 'gw-demo' : null,
     },
+    ...(demoGatewayState(hasGateway, gatewayOnline) ? { gateway_state: demoGatewayState(hasGateway, gatewayOnline) } : {}),
     ...(hasGateway ? { gateway: { id: 'gw-demo', online: gatewayOnline, hostname: 'demo-gateway' } } : {}),
     // Armoire fictive (guide utilisateur, portal-user-guide-2026-10-006) : IP de la
     // plage réservée à la documentation (RFC 5737), aucun équipement réel.
