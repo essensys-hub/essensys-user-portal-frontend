@@ -100,10 +100,17 @@ export interface PortalArmoireInfo {
   online?: boolean;
 }
 
+export type GatewayState = 'none' | 'offline' | 'online';
+
 export interface PortalSessionResponse {
   user: PortalUserInfo;
   portal_access: boolean;
   gateway?: PortalGatewayInfo | null;
+  /**
+   * Présence de la gateway (sonnette-plages-push-2026-11-008). Champ absent (ancien cloud) :
+   * l'affichage retombe sur le bloc `gateway`.
+   */
+  gateway_state?: GatewayState;
   armoire?: PortalArmoireInfo | null;
 }
 
